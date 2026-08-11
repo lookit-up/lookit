@@ -1,0 +1,1434 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Tab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#ffd400;
+    --accent-ink:#141105;
+
+    /* light (default) */
+    --bg:#f6f4ec;
+    --surface:#ffffff;
+    --surface-2:#efece2;
+    --line:rgba(20,17,5,0.10);
+    --text:#17140b;
+    --text-dim:#68624f;
+    --text-faint:#a29c85;
+    --shadow:0 10px 30px rgba(20,17,5,0.08);
+  }
+
+  html.dark{
+    --bg:#0b0a06;
+    --surface:#15130c;
+    --surface-2:#1d1a10;
+    --line:rgba(255,212,0,0.12);
+    --text:#f5f2e6;
+    --text-dim:#a39c86;
+    --text-faint:#6b6555;
+    --shadow:0 10px 34px rgba(0,0,0,0.45);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+
+  body{
+    font-family:'Inter', sans-serif;
+    color:var(--text);
+    background:var(--bg);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    transition:color .25s ease;
+  }
+
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- background layer ---------- */
+  #bg-layer{
+    position:fixed; inset:0; z-index:0;
+    background-size:cover; background-position:center;
+    transition:opacity .5s ease;
+  }
+  #bg-scrim{
+    position:fixed; inset:0; z-index:1;
+    background:var(--bg);
+    opacity:0;
+    transition:opacity .4s ease, background .25s ease;
+    pointer-events:none;
+  }
+  body.has-bg #bg-scrim{ opacity:0.38; }
+  html.dark body.has-bg #bg-scrim{ opacity:0.5; }
+
+  /* ---------- main content ---------- */
+  .stage{
+    position:relative; z-index:2;
+    height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:34px;
+    padding:0 20px;
+  }
+
+  .clock{
+    text-align:center;
+    user-select:none;
+  }
+  .clock .time{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(3.4rem, 11vw, 7.5rem);
+    letter-spacing:-0.02em;
+    line-height:1;
+    display:inline-flex;
+    text-shadow:0 2px 30px rgba(0,0,0,0.06);
+  }
+  html.dark .clock .time{ text-shadow:0 2px 40px rgba(255,212,0,0.08); }
+  .clock .time .colon{
+    animation:blink 2s steps(1) infinite;
+    padding:0 2px;
+    color:var(--accent);
+  }
+  @keyframes blink{ 0%,49%{opacity:1;} 50%,100%{opacity:0.25;} }
+  .clock .meridiem{
+    font-size:0.34em; font-weight:600; margin-left:10px;
+    color:var(--accent); vertical-align:middle; position:relative; top:-0.1em;
+  }
+  .clock .date{
+    margin-top:12px;
+    font-size:0.95rem; font-weight:500;
+    color:var(--text-dim);
+    letter-spacing:0.02em;
+  }
+
+  .search-wrap{
+    width:min(560px, 86vw);
+  }
+  .search-bar{
+    display:flex; align-items:center; gap:12px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:15px 22px;
+    box-shadow:var(--shadow);
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .search-bar:hover{ transform:translateY(-2px); }
+  .search-bar.focused{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent), var(--shadow);
+    transform:translateY(-2px);
+  }
+  .search-bar svg{ flex-shrink:0; color:var(--text-faint); transition:color .2s ease; }
+  .search-bar.focused svg{ color:var(--accent); }
+  .search-bar input{
+    flex:1; border:none; outline:none; background:none;
+    font-family:'Inter', sans-serif; font-size:0.98rem; color:var(--text);
+  }
+  .search-bar input::placeholder{ color:var(--text-faint); }
+
+  .search-bar .spinner{
+    display:none;
+    width:16px; height:16px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--accent);
+    animation:spin .7s linear infinite; flex-shrink:0;
+  }
+  .search-bar.loading .spinner{ display:block; }
+  .search-bar.loading .search-icon{ display:none; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- results panel ---------- */
+  .results-panel{
+    display:none;
+    width:min(680px, 92vw);
+    max-height:56vh;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+  }
+  .results-panel.open{ display:block; animation:fadeIn .2s ease; }
+  .results-panel::-webkit-scrollbar{ width:6px; }
+  .results-panel::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+
+  .results-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .results-head .tag{
+    font-size:0.7rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--accent);
+  }
+  .results-close{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text-dim); cursor:pointer;
+    display:grid; place-items:center; transition:border-color .16s ease, color .16s ease, transform .16s ease;
+  }
+  .results-close:hover{ border-color:var(--accent); color:var(--accent); transform:rotate(90deg); }
+
+  .answer-box{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; margin-bottom:16px; font-size:0.9rem; line-height:1.6; color:var(--text);
+  }
+
+  .result-link{
+    display:block; padding:12px 0; border-bottom:1px solid var(--line);
+    transition:transform .15s ease;
+  }
+  .result-link:last-child{ border-bottom:none; }
+  .result-link:hover{ transform:translateX(3px); }
+  .result-link .r-title{ font-size:0.92rem; font-weight:600; color:var(--text); margin-bottom:3px; }
+  .result-link:hover .r-title{ color:var(--accent); }
+  .result-link .r-url{ font-size:0.74rem; color:var(--text-faint); margin-bottom:5px; }
+  .result-link .r-snippet{ font-size:0.82rem; color:var(--text-dim); line-height:1.5; }
+
+  .media-card{ display:flex; gap:16px; }
+  .media-card img{
+    width:120px; height:180px; object-fit:cover; border-radius:10px; flex-shrink:0;
+    background:var(--surface-2);
+  }
+  .media-card .m-title{ font-family:'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:4px; }
+  .media-card .m-sub{ font-size:0.78rem; color:var(--text-faint); margin-bottom:10px; }
+  .media-card .m-desc{ font-size:0.84rem; color:var(--text-dim); line-height:1.55; }
+  .media-related{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .media-related span{
+    font-size:0.76rem; padding:5px 10px; border-radius:999px;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--text-dim);
+  }
+
+  .song-card{ display:flex; gap:16px; align-items:center; }
+  .song-card img{ width:88px; height:88px; border-radius:12px; object-fit:cover; background:var(--surface-2); flex-shrink:0; }
+  .song-card .s-title{ font-family:'Space Grotesk', sans-serif; font-size:1.02rem; font-weight:700; }
+  .song-card .s-sub{ font-size:0.82rem; color:var(--text-dim); margin-top:3px; }
+  .song-card .s-link{ display:inline-block; margin-top:10px; font-size:0.8rem; font-weight:600; color:var(--accent); }
+
+  .image-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .image-grid a{ display:block; aspect-ratio:1; border-radius:10px; overflow:hidden; background:var(--surface-2); }
+  .image-grid img{ width:100%; height:100%; object-fit:cover; transition:transform .2s ease; }
+  .image-grid a:hover img{ transform:scale(1.06); }
+
+  .results-empty{ font-size:0.86rem; color:var(--text-faint); text-align:center; padding:20px 0; }
+
+  /* ---------- favorites ---------- */
+  .favorites{
+    display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:center;
+    gap:10px;
+    width:min(560px, 86vw);
+  }
+  .fav-item{
+    display:flex; flex-direction:column; align-items:center; gap:7px;
+    width:64px;
+    cursor:pointer;
+    padding:6px 0;
+    border-radius:12px;
+    transition:transform .18s ease;
+  }
+  .fav-item:hover{ transform:translateY(-3px); }
+  .fav-icon{
+    width:42px; height:42px; border-radius:13px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    display:grid; place-items:center;
+    overflow:hidden;
+    transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .fav-item:hover .fav-icon{ border-color:var(--accent); }
+  .fav-icon img{ width:20px; height:20px; }
+  .fav-icon .fallback{
+    display:none;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:0.95rem;
+    color:var(--accent);
+  }
+  .fav-icon .fallback.show{ display:block; }
+  .fav-label{
+    font-size:0.7rem; font-weight:500; color:var(--text-dim);
+    max-width:64px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .fav-add .fav-icon{
+    background:none; border-style:dashed; color:var(--text-faint);
+  }
+  .fav-add:hover .fav-icon{ color:var(--accent); }
+
+  /* ---------- favorite modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:60;
+    background:rgba(10,9,4,0.45);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    width:320px; max-width:88vw;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:22px;
+    transform:translateY(10px) scale(0.97);
+    transition:transform .2s ease;
+  }
+  .modal-overlay.open .modal-box{ transform:translateY(0) scale(1); }
+  .modal-box h4{
+    font-family:'Space Grotesk', sans-serif; font-size:1rem; margin-bottom:16px;
+  }
+  .modal-field{ margin-bottom:12px; }
+  .modal-field label{
+    display:block; font-size:0.74rem; font-weight:600; color:var(--text-faint);
+    margin-bottom:6px; text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .modal-field input{
+    width:100%; padding:10px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    font-size:0.88rem; outline:none;
+  }
+  .modal-field input:focus{ border-color:var(--accent); }
+  .modal-actions{
+    display:flex; justify-content:flex-end; gap:8px; margin-top:18px;
+  }
+  .modal-actions .mini-btn.primary{
+    background:var(--accent); color:var(--accent-ink); border-color:transparent;
+  }
+
+  /* ---------- custom context menu ---------- */
+  .context-menu{
+    position:fixed; z-index:70;
+    min-width:180px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:12px;
+    box-shadow:var(--shadow);
+    padding:6px;
+    opacity:0; transform:scale(0.96); transform-origin:top left;
+    pointer-events:none;
+    transition:opacity .14s ease, transform .14s ease;
+  }
+  .context-menu.open{ opacity:1; transform:scale(1); pointer-events:auto; }
+  .context-menu button{
+    display:flex; align-items:center; gap:10px;
+    width:100%; padding:9px 10px; border-radius:8px;
+    background:none; border:none; text-align:left; cursor:pointer;
+    font-family:'Inter', sans-serif; font-size:0.84rem; font-weight:500; color:var(--text);
+    transition:background .13s ease;
+  }
+  .context-menu button:hover{ background:var(--surface-2); color:var(--accent); }
+  .context-menu button.danger:hover{ color:#e0555f; }
+  .context-menu button svg{ flex-shrink:0; opacity:0.75; }
+
+  /* ---------- settings trigger + icon ---------- */
+  #corner-hotzone{
+    position:fixed; left:0; bottom:0; width:180px; height:180px; z-index:40;
+    pointer-events:none;
+  }
+  #settings-btn{
+    position:fixed; left:22px; bottom:22px; z-index:41;
+    width:44px; height:44px; border-radius:50%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    display:grid; place-items:center;
+    color:var(--text-dim);
+    cursor:pointer;
+    opacity:0; transform:translateY(10px) scale(0.92);
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease, color .2s ease, border-color .2s ease;
+  }
+  #settings-btn.visible{
+    opacity:1; transform:translateY(0) scale(1);
+    pointer-events:auto;
+  }
+  #settings-btn:hover{
+    color:var(--accent); border-color:var(--accent);
+    transform:translateY(-3px) scale(1.05) rotate(28deg);
+  }
+  #settings-btn.active{ color:var(--accent); border-color:var(--accent); }
+  #settings-btn svg{ width:19px; height:19px; transition:transform .3s ease; }
+
+  /* ---------- settings panel ---------- */
+  #panel{
+    position:fixed; left:22px; bottom:80px; z-index:42;
+    width:380px; max-width:88vw; max-height:min(620px, 76vh);
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    display:flex; flex-direction:column;
+    overflow:hidden;
+    opacity:0; transform:translateY(14px) scale(0.97);
+    pointer-events:none;
+    transition:opacity .22s ease, transform .22s ease;
+  }
+  #panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+
+  .tabs{
+    display:flex; gap:4px; padding:14px 14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .tab-btn{
+    flex:1; padding:10px 8px 14px; text-align:center;
+    background:none; border:none; cursor:pointer;
+    font-family:'Inter', sans-serif; font-size:0.82rem; font-weight:600;
+    color:var(--text-faint);
+    position:relative;
+    transition:color .18s ease;
+  }
+  .tab-btn:hover{ color:var(--text); }
+  .tab-btn.active{ color:var(--accent); }
+  .tab-btn.active::after{
+    content:''; position:absolute; left:14%; right:14%; bottom:0; height:2px;
+    background:var(--accent); border-radius:2px;
+  }
+
+  .panel-body{ padding:20px; overflow-y:auto; }
+  .panel-body::-webkit-scrollbar{ width:6px; }
+  .panel-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:6px; }
+
+  .tab-pane{ display:none; }
+  .tab-pane.active{ display:block; animation:fadeIn .2s ease; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{ opacity:1; transform:translateY(0);} }
+
+  .row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px; padding:13px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .row:last-child{ border-bottom:none; }
+  .row-label{ font-size:0.86rem; font-weight:500; }
+  .row-sub{ font-size:0.74rem; color:var(--text-faint); margin-top:2px; }
+
+  .switch{
+    width:42px; height:24px; border-radius:999px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    position:relative; cursor:pointer; flex-shrink:0;
+    transition:background .2s ease;
+  }
+  .switch::after{
+    content:''; position:absolute; top:2px; left:2px;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--text-faint);
+    transition:transform .2s ease, background .2s ease;
+  }
+  .switch.on{ background:color-mix(in srgb, var(--accent) 30%, var(--surface-2)); border-color:var(--accent); }
+  .switch.on::after{ transform:translateX(18px); background:var(--accent); }
+
+  .seg{
+    display:flex; background:var(--surface-2); border-radius:10px; padding:3px;
+    border:1px solid var(--line);
+  }
+  .seg button{
+    flex:1; padding:8px 6px; border:none; background:none; cursor:pointer;
+    font-size:0.78rem; font-weight:600; color:var(--text-faint); border-radius:8px;
+    transition:background .18s ease, color .18s ease;
+  }
+  .seg button.active{ background:var(--surface); color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+
+  .section-title{
+    font-size:0.72rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--text-faint); margin:20px 0 10px;
+  }
+  .section-title:first-child{ margin-top:0; }
+
+  .swatch-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 0; }
+  .swatch-row .row-label{ width:76px; flex-shrink:0; }
+  .swatch{
+    width:26px; height:26px; border-radius:50%;
+    border:2px solid transparent;
+    cursor:pointer; flex-shrink:0;
+    transition:transform .16s ease, border-color .16s ease;
+  }
+  .swatch:hover{ transform:scale(1.15); }
+  .swatch.selected{ border-color:var(--text); box-shadow:0 0 0 2px var(--surface); }
+
+  .hex-row{ display:flex; align-items:center; gap:8px; padding:10px 0; }
+  .hex-row .row-label{ width:76px; flex-shrink:0; }
+  .hex-row input[type="text"]{
+    flex:1; min-width:0; padding:8px 10px; border-radius:8px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    font-family:'JetBrains Mono', monospace; font-size:0.8rem; outline:none;
+  }
+  .hex-row input[type="text"]:focus{ border-color:var(--accent); }
+  .hex-row input[type="color"]{
+    width:30px; height:30px; border:none; border-radius:8px; background:none; cursor:pointer; padding:0;
+  }
+  .mini-btn{
+    padding:7px 12px; border-radius:8px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-size:0.76rem; font-weight:600;
+    cursor:pointer; transition:border-color .16s ease, background .16s ease, transform .16s ease;
+    white-space:nowrap;
+  }
+  .mini-btn:hover{ border-color:var(--accent); transform:translateY(-1px); }
+
+  .bg-search{ display:flex; gap:8px; margin-bottom:12px; }
+  .bg-search input{
+    flex:1; padding:9px 12px; border-radius:8px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    font-size:0.82rem; outline:none;
+  }
+  .bg-search input:focus{ border-color:var(--accent); }
+
+  .bg-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:6px;
+  }
+  .bg-thumb{
+    aspect-ratio:1; border-radius:8px; background-size:cover; background-position:center;
+    cursor:pointer; border:2px solid transparent; background-color:var(--surface-2);
+    transition:transform .16s ease, border-color .16s ease;
+  }
+  .bg-thumb:hover{ transform:scale(1.04); }
+  .bg-thumb.selected{ border-color:var(--accent); }
+  .bg-status{ font-size:0.76rem; color:var(--text-faint); margin:4px 0 12px; min-height:1em; }
+
+  .bg-custom{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .bg-custom input[type="text"]{
+    flex:1; min-width:120px; padding:9px 12px; border-radius:8px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    font-size:0.82rem; outline:none;
+  }
+  .bg-custom input[type="text"]:focus{ border-color:var(--accent); }
+  .file-btn{
+    position:relative; overflow:hidden;
+  }
+  .file-btn input[type="file"]{
+    position:absolute; inset:0; opacity:0; cursor:pointer;
+  }
+
+  .reset-btn{
+    width:100%; margin-top:22px; padding:11px; border-radius:10px;
+    border:1px solid var(--line); background:none; color:var(--text-dim);
+    font-size:0.82rem; font-weight:600; cursor:pointer;
+    transition:border-color .18s ease, color .18s ease;
+  }
+  .reset-btn:hover{ border-color:#e0555f; color:#e0555f; }
+
+  .erase-btn{
+    padding:8px 14px; border-radius:8px; border:1px solid rgba(224,85,95,0.4);
+    background:rgba(224,85,95,0.08); color:#e0555f; font-size:0.78rem; font-weight:600;
+    cursor:pointer; transition:background .18s ease, transform .16s ease;
+    flex-shrink:0;
+  }
+  .erase-btn:hover{ background:rgba(224,85,95,0.16); transform:translateY(-1px); }
+
+  .premium-card{
+    text-align:center; padding:22px 10px 8px;
+  }
+  .premium-card .icon{
+    width:46px; height:46px; border-radius:12px; margin:0 auto 14px;
+    background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ff8a00));
+    display:grid; place-items:center; color:var(--accent-ink);
+  }
+  .premium-card h4{
+    font-family:'Space Grotesk', sans-serif; font-size:1rem; margin-bottom:8px;
+  }
+  .premium-card p{
+    font-size:0.82rem; color:var(--text-dim); line-height:1.55; margin-bottom:18px;
+  }
+  .premium-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 24px; border-radius:10px;
+    background:var(--accent); color:var(--accent-ink);
+    font-size:0.86rem; font-weight:700; cursor:pointer; border:none;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .premium-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 22px color-mix(in srgb, var(--accent) 45%, transparent); }
+</style>
+</head>
+<body>
+
+<div id="bg-layer"></div>
+<div id="bg-scrim"></div>
+
+<div class="stage">
+  <div class="clock">
+    <div class="time" id="clock-time"></div>
+    <div class="date" id="clock-date"></div>
+  </div>
+
+  <div class="search-wrap">
+    <form class="search-bar" id="search-form">
+      <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <div class="spinner"></div>
+      <input type="text" id="search-input" placeholder="Search the web" autocomplete="off" autofocus>
+    </form>
+  </div>
+
+  <div class="results-panel" id="results-panel"></div>
+
+  <div class="favorites" id="favorites"></div>
+</div>
+
+<div class="modal-overlay" id="fav-modal-overlay">
+  <div class="modal-box">
+    <h4 id="fav-modal-title">Add favorite</h4>
+    <div class="modal-field">
+      <label for="fav-name-input">Name</label>
+      <input type="text" id="fav-name-input" placeholder="e.g. Mail" maxlength="24">
+    </div>
+    <div class="modal-field">
+      <label for="fav-url-input">URL</label>
+      <input type="text" id="fav-url-input" placeholder="e.g. mail.google.com">
+    </div>
+    <div class="modal-actions">
+      <button class="mini-btn" id="fav-modal-cancel">Cancel</button>
+      <button class="mini-btn primary" id="fav-modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="context-menu" id="context-menu"></div>
+
+<div id="corner-hotzone"></div>
+<button id="settings-btn" aria-label="Settings">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 00.33 1.87l.06.06a2.06 2.06 0 11-2.92 2.92l-.06-.06a1.7 1.7 0 00-1.87-.33 1.7 1.7 0 00-1.03 1.56V20a2.06 2.06 0 01-4.12 0v-.09A1.7 1.7 0 008.7 18.3a1.7 1.7 0 00-1.87.33l-.06.06a2.06 2.06 0 11-2.92-2.92l.06-.06a1.7 1.7 0 00.33-1.87 1.7 1.7 0 00-1.56-1.03H2.6a2.06 2.06 0 010-4.12h.09A1.7 1.7 0 004.3 8.7a1.7 1.7 0 00-.33-1.87l-.06-.06a2.06 2.06 0 112.92-2.92l.06.06a1.7 1.7 0 001.87.33H8.8A1.7 1.7 0 0010.4 2.6V2.5a2.06 2.06 0 014.12 0v.09a1.7 1.7 0 001.03 1.56 1.7 1.7 0 001.87-.33l.06-.06a2.06 2.06 0 112.92 2.92l-.06.06a1.7 1.7 0 00-.33 1.87v.1c.2.67.78 1.16 1.56 1.16h.09a2.06 2.06 0 010 4.12h-.09a1.7 1.7 0 00-1.56 1.03z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+</button>
+
+<div id="panel">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="general">General</button>
+    <button class="tab-btn" data-tab="customize">Customize</button>
+    <button class="tab-btn" data-tab="premium">Premium</button>
+  </div>
+
+  <div class="panel-body">
+
+    <div class="tab-pane active" data-pane="general">
+      <div class="row">
+        <div>
+          <div class="row-label">Clock mode</div>
+          <div class="row-sub">24-hour is default</div>
+        </div>
+        <div class="seg" id="clock-mode-seg">
+          <button data-val="24h" class="active">24h</button>
+          <button data-val="12h">12h</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Auto time zone</div>
+          <div class="row-sub">Use your location to set the time zone</div>
+        </div>
+        <div class="switch" id="auto-tz-switch"></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Erase data</div>
+          <div class="row-sub">Clears all saved settings on this device</div>
+        </div>
+        <button class="erase-btn" id="erase-btn">Erase</button>
+      </div>
+    </div>
+
+    <div class="tab-pane" data-pane="customize">
+      <div class="section-title">Color theme</div>
+
+      <div class="swatch-row">
+        <div class="row-label">Yellow</div>
+        <div class="swatch selected" data-accent="#ffd400" style="background:#ffd400;"></div>
+      </div>
+
+      <div class="swatch-row" id="pastel-row">
+        <div class="row-label">Pastel</div>
+        <div class="swatch" data-accent="#ffc9a8" style="background:#ffc9a8;"></div>
+        <div class="swatch" data-accent="#b8ecd4" style="background:#b8ecd4;"></div>
+        <div class="swatch" data-accent="#d6c8ff" style="background:#d6c8ff;"></div>
+        <div class="swatch" data-accent="#bfe4ff" style="background:#bfe4ff;"></div>
+        <div class="swatch" data-accent="#ffcbe0" style="background:#ffcbe0;"></div>
+      </div>
+
+      <div class="hex-row">
+        <div class="row-label">Hex code</div>
+        <input type="text" id="hex-text" placeholder="#FFD400" maxlength="7">
+        <input type="color" id="hex-picker" value="#ffd400">
+        <button class="mini-btn" id="hex-apply">Apply</button>
+      </div>
+
+      <div class="row" style="margin-top:6px;">
+        <div class="row-label">Appearance</div>
+        <div class="seg" id="mode-seg">
+          <button data-val="light" class="active">Light</button>
+          <button data-val="dark">Dark</button>
+          <button data-val="device">Device</button>
+        </div>
+      </div>
+
+      <div class="section-title">Background</div>
+
+      <form class="bg-search" id="bg-search-form">
+        <input type="text" id="bg-search-input" placeholder="Search Pexels — e.g. mountains">
+        <button class="mini-btn" type="submit">Search</button>
+      </form>
+      <div class="bg-status" id="bg-status">Photos by Pexels</div>
+      <div class="bg-grid" id="bg-grid"></div>
+
+      <div class="row-sub" style="margin:14px 0 8px;">Or use your own</div>
+      <div class="bg-custom">
+        <input type="text" id="bg-url-input" placeholder="Paste an image URL">
+        <button class="mini-btn" id="bg-url-apply">Set</button>
+        <button class="mini-btn file-btn">
+          Upload
+          <input type="file" id="bg-file-input" accept="image/*">
+        </button>
+        <button class="mini-btn" id="bg-clear">None</button>
+      </div>
+
+      <button class="reset-btn" id="reset-theme-btn">Reset to defaults</button>
+    </div>
+
+    <div class="tab-pane" data-pane="premium">
+      <div class="premium-card">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7L12 2z" fill="currentColor"/></svg>
+        </div>
+        <h4>Go premium</h4>
+        <p>Unlock more themes, unlimited custom backgrounds, and sync across your devices.</p>
+        <button class="premium-btn" id="premium-btn">
+          Upgrade now
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ============ CONFIG ============ */
+  var PEXELS_API_KEY     = "Da0j8H8sQz3ICuWzsVX9pPxbmvOhsTMa7joMG54dF7BnYtWYn6mOGcZz";      // used for background search + image results
+  var OPENROUTER_API_KEY = "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";  // classifies query intent
+  var TAVILY_API_KEY     = "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";      // general web queries
+  var AUDIODB_API_KEY    = "123";  // songs
+  var TMDB_API_KEY       = "a319cd84a2bfc1837bd810837b142dc0";         // movies
+  var OPENROUTER_MODEL   = "openai/gpt-4o-mini";
+
+  var STORAGE_KEY = "ntab_settings_v1";
+  var GOOGLE_SEARCH = "https://www.google.com/search?q=";
+  var GOOGLE_IMAGES = "https://www.google.com/search?tbm=isch&q=";
+
+  var defaults = {
+    clockMode: "24h",
+    autoTZ: false,
+    accent: "#ffd400",
+    mode: "light",
+    bgType: "none",   // none | url | data
+    bgValue: "",
+    favorites: []     // [{ name, url }]
+  };
+
+  var settings = Object.assign({}, defaults, loadSettings());
+
+  function loadSettings(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveSettings(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }catch(e){}
+  }
+
+  /* ============ CLOCK ============ */
+  var timeEl = document.getElementById('clock-time');
+  var dateEl = document.getElementById('clock-date');
+
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+
+  function renderClock(){
+    var now = new Date();
+    var h = now.getHours();
+    var m = pad(now.getMinutes());
+    var meridiem = '';
+
+    if(settings.clockMode === '12h'){
+      meridiem = h >= 12 ? 'PM' : 'AM';
+      h = h % 12; if(h === 0) h = 12;
+    } else {
+      h = pad(h);
+    }
+
+    timeEl.innerHTML = h + '<span class="colon">:</span>' + m +
+      (meridiem ? '<span class="meridiem">'+meridiem+'</span>' : '');
+
+    dateEl.textContent = now.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  }
+  renderClock();
+  setInterval(renderClock, 1000);
+
+  function requestAutoTZ(){
+    if(!settings.autoTZ || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      function(){ /* location confirmed — the browser's own time zone already tracks this */ },
+      function(){ /* permission denied or unavailable — silently fall back to system time zone */ }
+    );
+  }
+
+  /* ============ SEARCH ROUTING ============ */
+  var searchForm  = document.getElementById('search-form');
+  var searchBar   = document.querySelector('.search-bar');
+  var searchInput = document.getElementById('search-input');
+  var resultsPanel = document.getElementById('results-panel');
+
+  function fallbackGoogle(q){ window.location.href = GOOGLE_SEARCH + encodeURIComponent(q); }
+  function fallbackGoogleImages(q){ window.location.href = GOOGLE_IMAGES + encodeURIComponent(q); }
+
+  function setLoading(on){ searchBar.classList.toggle('loading', on); }
+
+  function openResults(html){
+    resultsPanel.innerHTML = html;
+    resultsPanel.classList.add('open');
+    document.getElementById('favorites').style.display = 'none';
+    var closeBtn = resultsPanel.querySelector('.results-close');
+    if(closeBtn) closeBtn.addEventListener('click', closeResults);
+  }
+  function closeResults(){
+    resultsPanel.classList.remove('open');
+    resultsPanel.innerHTML = '';
+    document.getElementById('favorites').style.display = '';
+    searchInput.value = '';
+  }
+  function panelHead(tag){
+    return '<div class="results-head"><span class="tag">'+tag+'</span>' +
+      '<button class="results-close" aria-label="Close">'+
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>' +
+      '</button></div>';
+  }
+
+  /* ---- intent classification via OpenRouter ---- */
+  function classifyQuery(q){
+    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY'){
+      return Promise.resolve({ type:'query', q:q });
+    }
+    var sys = 'Classify the user search into exactly one type: "song", "movie", "image", or "query". ' +
+      'Respond with ONLY compact JSON, no prose, no code fences. ' +
+      'Shape: {"type":"song|movie|image|query","q":"cleaned search text","artist":"","track":""}. ' +
+      'For type "song", best-effort split artist and track into their own fields (leave blank if unsure). ' +
+      'For everything else, "artist" and "track" can be empty strings.';
+
+    return fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + OPENROUTER_API_KEY
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        temperature: 0,
+        messages:[
+          { role:'system', content: sys },
+          { role:'user', content: q }
+        ]
+      })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var raw = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if(!raw) return { type:'query', q:q };
+      raw = raw.trim().replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+      try{
+        var parsed = JSON.parse(raw);
+        if(!parsed.q) parsed.q = q;
+        return parsed;
+      }catch(e){ return { type:'query', q:q }; }
+    })
+    .catch(function(){ return { type:'query', q:q }; });
+  }
+
+  /* ---- query -> Tavily ---- */
+  function handleQuery(intent, original){
+    var q = intent.q || original;
+    if(!TAVILY_API_KEY || TAVILY_API_KEY === 'YOUR_TAVILY_API_KEY'){ fallbackGoogle(q); return; }
+
+    fetch('https://api.tavily.com/search', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ api_key: TAVILY_API_KEY, query:q, search_depth:'basic', include_answer:true, max_results:6 })
+    })
+    .then(function(res){
+      if(res.status === 401 || res.status === 403 || res.status === 432){ throw new Error('no-credits'); }
+      return res.json();
+    })
+    .then(function(data){
+      if(!data || data.error || !data.results || !data.results.length){ throw new Error('no-results'); }
+
+      var html = panelHead('Query');
+      if(data.answer) html += '<div class="answer-box">'+ escapeHtml(data.answer) +'</div>';
+      html += data.results.map(function(r){
+        var host = '';
+        try{ host = new URL(r.url).hostname; }catch(e){}
+        return '<a class="result-link" href="'+ r.url +'" target="_blank" rel="noopener">' +
+          '<div class="r-title">'+ escapeHtml(r.title || r.url) +'</div>' +
+          '<div class="r-url">'+ escapeHtml(host) +'</div>' +
+          '<div class="r-snippet">'+ escapeHtml((r.content || '').slice(0,160)) +'</div>' +
+        '</a>';
+      }).join('');
+
+      openResults(html);
+    })
+    .catch(function(){ fallbackGoogle(q); })
+    .finally(function(){ setLoading(false); });
+  }
+
+  /* ---- song -> TheAudioDB ---- */
+  function handleSong(intent, original){
+    var artist = intent.artist || '';
+    var track = intent.track || intent.q || original;
+    if(!AUDIODB_API_KEY || AUDIODB_API_KEY === 'YOUR_THEAUDIODB_API_KEY'){ fallbackGoogle((artist+' '+track).trim()); return; }
+
+    var url = 'https://theaudiodb.com/api/v1/json/'+ AUDIODB_API_KEY +'/searchtrack.php?s='+ encodeURIComponent(artist) +'&t='+ encodeURIComponent(track);
+
+    fetch(url)
+      .then(function(res){
+        if(!res.ok) throw new Error('audiodb-error');
+        return res.json();
+      })
+      .then(function(data){
+        if(!data || !data.track || !data.track.length) throw new Error('no-track');
+        var t = data.track[0];
+        var thumb = t.strTrackThumb || t.strArtistThumb || '';
+        var html = panelHead('Song') +
+          '<div class="song-card">' +
+            (thumb ? '<img src="'+thumb+'" alt="">' : '') +
+            '<div>' +
+              '<div class="s-title">'+ escapeHtml(t.strTrack || track) +'</div>' +
+              '<div class="s-sub">'+ escapeHtml(t.strArtist || artist) + (t.strAlbum ? ' · '+escapeHtml(t.strAlbum) : '') +'</div>' +
+              (t.strMusicVid ? '<a class="s-link" href="'+t.strMusicVid+'" target="_blank" rel="noopener">Watch music video →</a>' : '') +
+            '</div>' +
+          '</div>';
+        openResults(html);
+      })
+      .catch(function(){ fallbackGoogle((artist+' '+track).trim()); })
+      .finally(function(){ setLoading(false); });
+  }
+
+  /* ---- image -> Pexels ---- */
+  function handleImage(intent, original){
+    var q = intent.q || original;
+    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'YOUR_PEXELS_API_KEY'){ fallbackGoogleImages(q); return; }
+
+    fetch('https://api.pexels.com/v1/search?query='+ encodeURIComponent(q) +'&per_page=9', {
+      headers:{ Authorization: PEXELS_API_KEY }
+    })
+    .then(function(res){
+      if(res.status === 401 || res.status === 429) throw new Error('no-credits');
+      var remaining = res.headers.get('X-Ratelimit-Remaining');
+      if(remaining !== null && parseInt(remaining,10) <= 0) throw new Error('no-credits');
+      return res.json();
+    })
+    .then(function(data){
+      if(!data || !data.photos || !data.photos.length) throw new Error('no-photos');
+      var html = panelHead('Image') +
+        '<div class="image-grid">' +
+        data.photos.map(function(p){
+          return '<a href="'+p.url+'" target="_blank" rel="noopener"><img src="'+p.src.medium+'" alt="'+escapeHtml(p.alt||'')+'"></a>';
+        }).join('') +
+        '</div>';
+      openResults(html);
+    })
+    .catch(function(){ fallbackGoogleImages(q); })
+    .finally(function(){ setLoading(false); });
+  }
+
+  /* ---- movie -> TheMovieDB ---- */
+  function handleMovie(intent, original){
+    var q = intent.q || original;
+    if(!TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY'){ fallbackGoogle(q); return; }
+
+    fetch('https://api.themoviedb.org/3/search/movie?api_key='+ TMDB_API_KEY +'&query='+ encodeURIComponent(q))
+      .then(function(res){
+        if(res.status === 401) throw new Error('tmdb-auth');
+        return res.json();
+      })
+      .then(function(data){
+        if(!data || data.success === false || !data.results || !data.results.length) throw new Error('no-results');
+        var m = data.results[0];
+        var related = data.results.slice(1,4);
+        var poster = m.poster_path ? 'https://image.tmdb.org/t/p/w300'+m.poster_path : '';
+        var year = (m.release_date || '').slice(0,4);
+        var html = panelHead('Movie') +
+          '<div class="media-card">' +
+            (poster ? '<img src="'+poster+'" alt="">' : '') +
+            '<div>' +
+              '<div class="m-title">'+ escapeHtml(m.title) + (year ? ' ('+year+')' : '') +'</div>' +
+              '<div class="m-sub">★ '+ (m.vote_average || '–') +' / 10</div>' +
+              '<div class="m-desc">'+ escapeHtml((m.overview || 'No synopsis available.').slice(0,220)) +'</div>' +
+              (related.length ? '<div class="media-related">'+ related.map(function(r){ return '<span>'+escapeHtml(r.title)+'</span>'; }).join('') +'</div>' : '') +
+            '</div>' +
+          '</div>';
+        openResults(html);
+      })
+      .catch(function(){ fallbackGoogle(q); })
+      .finally(function(){ setLoading(false); });
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  searchForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var q = searchInput.value.trim();
+    if(!q) return;
+
+    setLoading(true);
+    classifyQuery(q).then(function(intent){
+      switch(intent.type){
+        case 'song':  handleSong(intent, q); break;
+        case 'movie': handleMovie(intent, q); break;
+        case 'image': handleImage(intent, q); break;
+        default:      handleQuery(intent, q);
+      }
+    });
+  });
+
+  searchInput.addEventListener('focus', function(){ searchBar.classList.add('focused'); });
+  searchInput.addEventListener('blur', function(){ searchBar.classList.remove('focused'); });
+
+  /* ============ CORNER-TRIGGERED SETTINGS ICON ============ */
+  var settingsBtn = document.getElementById('settings-btn');
+  var panel = document.getElementById('panel');
+  var HOTZONE_RADIUS = 170;
+
+  document.addEventListener('mousemove', function(e){
+    if(panel.classList.contains('open')) return;
+    var dx = e.clientX - 0;
+    var dy = e.clientY - window.innerHeight;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    settingsBtn.classList.toggle('visible', dist < HOTZONE_RADIUS);
+  });
+  document.addEventListener('mouseleave', function(){
+    if(!panel.classList.contains('open')) settingsBtn.classList.remove('visible');
+  });
+
+  function openSettingsPanel(){
+    panel.classList.add('open');
+    settingsBtn.classList.add('active', 'visible');
+  }
+  function closeSettingsPanel(){
+    panel.classList.remove('open');
+    settingsBtn.classList.remove('active');
+  }
+  settingsBtn.addEventListener('click', function(){
+    if(panel.classList.contains('open')) closeSettingsPanel();
+    else openSettingsPanel();
+  });
+  document.addEventListener('click', function(e){
+    if(panel.classList.contains('open') &&
+       !panel.contains(e.target) &&
+       !settingsBtn.contains(e.target)){
+      panel.classList.remove('open');
+      settingsBtn.classList.remove('active');
+    }
+  });
+
+  /* ============ TABS ============ */
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelector('[data-pane="'+btn.dataset.tab+'"]').classList.add('active');
+    });
+  });
+
+  /* ============ GENERAL: clock mode ============ */
+  var clockSeg = document.getElementById('clock-mode-seg');
+  clockSeg.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      clockSeg.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      settings.clockMode = btn.dataset.val;
+      saveSettings(); renderClock();
+    });
+  });
+
+  /* ============ GENERAL: auto timezone ============ */
+  var tzSwitch = document.getElementById('auto-tz-switch');
+  tzSwitch.addEventListener('click', function(){
+    settings.autoTZ = !settings.autoTZ;
+    tzSwitch.classList.toggle('on', settings.autoTZ);
+    saveSettings();
+    requestAutoTZ();
+  });
+
+  /* ============ GENERAL: erase data ============ */
+  document.getElementById('erase-btn').addEventListener('click', function(){
+    if(confirm('Erase all saved settings on this device? This cannot be undone.')){
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      window.location.reload();
+    }
+  });
+
+  /* ============ CUSTOMIZE: accent color ============ */
+  function setAccent(hex, selectedEl){
+    settings.accent = hex;
+    document.documentElement.style.setProperty('--accent', hex);
+    document.querySelectorAll('.swatch').forEach(function(s){ s.classList.remove('selected'); });
+    if(selectedEl) selectedEl.classList.add('selected');
+    document.getElementById('hex-text').value = hex;
+    document.getElementById('hex-picker').value = hex;
+    saveSettings();
+  }
+  document.querySelectorAll('.swatch').forEach(function(sw){
+    sw.addEventListener('click', function(){ setAccent(sw.dataset.accent, sw); });
+  });
+  document.getElementById('hex-apply').addEventListener('click', applyHex);
+  document.getElementById('hex-picker').addEventListener('input', function(){
+    document.getElementById('hex-text').value = this.value;
+    applyHex();
+  });
+  function applyHex(){
+    var val = document.getElementById('hex-text').value.trim();
+    if(!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(val)){
+      document.getElementById('hex-text').style.borderColor = '#e0555f';
+      return;
+    }
+    document.getElementById('hex-text').style.borderColor = '';
+    setAccent(val, null);
+  }
+
+  /* ============ CUSTOMIZE: appearance mode ============ */
+  var modeSeg = document.getElementById('mode-seg');
+  function applyMode(mode){
+    var effective = mode;
+    if(mode === 'device'){
+      effective = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.classList.toggle('dark', effective === 'dark');
+  }
+  modeSeg.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      modeSeg.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      settings.mode = btn.dataset.val;
+      saveSettings();
+      applyMode(settings.mode);
+    });
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+    if(settings.mode === 'device') applyMode('device');
+  });
+
+  /* ============ CUSTOMIZE: background ============ */
+  var bgLayer = document.getElementById('bg-layer');
+  function applyBackground(type, value){
+    settings.bgType = type;
+    settings.bgValue = value || '';
+    if(type === 'none' || !value){
+      bgLayer.style.backgroundImage = 'none';
+      document.body.classList.remove('has-bg');
+    } else {
+      bgLayer.style.backgroundImage = 'url("'+value+'")';
+      document.body.classList.add('has-bg');
+    }
+    saveSettings();
+  }
+
+  document.getElementById('bg-search-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var q = document.getElementById('bg-search-input').value.trim();
+    if(!q) return;
+    var status = document.getElementById('bg-status');
+    var grid = document.getElementById('bg-grid');
+
+    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'YOUR_PEXELS_API_KEY'){
+      status.textContent = 'Add a Pexels API key in the code to enable photo search.';
+      return;
+    }
+    status.textContent = 'Searching…';
+    grid.innerHTML = '';
+
+    fetch('https://api.pexels.com/v1/search?query=' + encodeURIComponent(q) + '&per_page=9', {
+      headers: { Authorization: PEXELS_API_KEY }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      status.textContent = 'Photos by Pexels';
+      (data.photos || []).forEach(function(photo){
+        var thumb = document.createElement('div');
+        thumb.className = 'bg-thumb';
+        thumb.style.backgroundImage = 'url("'+photo.src.tiny+'")';
+        thumb.addEventListener('click', function(){
+          document.querySelectorAll('.bg-thumb').forEach(function(t){ t.classList.remove('selected'); });
+          thumb.classList.add('selected');
+          applyBackground('url', photo.src.landscape || photo.src.large2x || photo.src.original);
+        });
+        grid.appendChild(thumb);
+      });
+      if(!data.photos || !data.photos.length){ status.textContent = 'No results for "'+q+'"'; }
+    })
+    .catch(function(){
+      status.textContent = 'Could not reach Pexels right now.';
+    });
+  });
+
+  document.getElementById('bg-url-apply').addEventListener('click', function(){
+    var url = document.getElementById('bg-url-input').value.trim();
+    if(url) applyBackground('url', url);
+  });
+
+  document.getElementById('bg-file-input').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        applyBackground('data', ev.target.result);
+      }catch(err){
+        document.getElementById('bg-status').textContent = 'That image was too large to save.';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('bg-clear').addEventListener('click', function(){
+    applyBackground('none', '');
+    document.querySelectorAll('.bg-thumb').forEach(function(t){ t.classList.remove('selected'); });
+  });
+
+  /* ============ CUSTOMIZE: reset ============ */
+  document.getElementById('reset-theme-btn').addEventListener('click', function(){
+    settings.accent = defaults.accent;
+    settings.mode = defaults.mode;
+    settings.bgType = defaults.bgType;
+    settings.bgValue = defaults.bgValue;
+    saveSettings();
+    applyAll();
+  });
+
+  /* ============ FAVORITES ============ */
+  var MAX_FAVORITES = 10;
+  var favoritesEl = document.getElementById('favorites');
+  var favModalOverlay = document.getElementById('fav-modal-overlay');
+  var favModalTitle = document.getElementById('fav-modal-title');
+  var favNameInput = document.getElementById('fav-name-input');
+  var favUrlInput = document.getElementById('fav-url-input');
+  var favEditIndex = null; // null = adding new
+
+  function normalizeUrl(raw){
+    var url = raw.trim();
+    if(!url) return '';
+    if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    return url;
+  }
+  function hostnameOf(url){
+    try{ return new URL(url).hostname; }catch(e){ return ''; }
+  }
+
+  function renderFavorites(){
+    favoritesEl.innerHTML = '';
+
+    settings.favorites.forEach(function(fav, i){
+      var item = document.createElement('div');
+      item.className = 'fav-item';
+      item.dataset.index = i;
+
+      var host = hostnameOf(fav.url);
+      var iconHtml = host
+        ? '<img src="https://www.google.com/s2/favicons?sz=64&domain='+host+'" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.classList.add(\'show\')">'
+        : '';
+
+      item.innerHTML =
+        '<div class="fav-icon">'+ iconHtml +
+          '<span class="fallback'+ (host ? '' : ' show') +'">'+ (fav.name.charAt(0).toUpperCase() || '?') +'</span>' +
+        '</div>' +
+        '<div class="fav-label">'+ escapeHtml(fav.name) +'</div>';
+
+      item.addEventListener('click', function(){ window.location.href = fav.url; });
+      favoritesEl.appendChild(item);
+    });
+
+    if(settings.favorites.length < MAX_FAVORITES){
+      var addItem = document.createElement('div');
+      addItem.className = 'fav-item fav-add';
+      addItem.innerHTML =
+        '<div class="fav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>' +
+        '<div class="fav-label">Add</div>';
+      addItem.addEventListener('click', function(){ openFavModal('add'); });
+      favoritesEl.appendChild(addItem);
+    }
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function openFavModal(mode, index){
+    favEditIndex = (mode === 'edit') ? index : null;
+    favModalTitle.textContent = (mode === 'edit') ? 'Edit favorite' : 'Add favorite';
+    if(mode === 'edit'){
+      favNameInput.value = settings.favorites[index].name;
+      favUrlInput.value = settings.favorites[index].url;
+    } else {
+      favNameInput.value = '';
+      favUrlInput.value = '';
+    }
+    favModalOverlay.classList.add('open');
+    setTimeout(function(){ favNameInput.focus(); }, 50);
+  }
+  function closeFavModal(){
+    favModalOverlay.classList.remove('open');
+    favEditIndex = null;
+  }
+  document.getElementById('fav-modal-cancel').addEventListener('click', closeFavModal);
+  favModalOverlay.addEventListener('click', function(e){
+    if(e.target === favModalOverlay) closeFavModal();
+  });
+
+  document.getElementById('fav-modal-save').addEventListener('click', function(){
+    var name = favNameInput.value.trim();
+    var url = normalizeUrl(favUrlInput.value);
+    if(!name || !url){
+      (name ? favUrlInput : favNameInput).style.borderColor = '#e0555f';
+      return;
+    }
+    favNameInput.style.borderColor = '';
+    favUrlInput.style.borderColor = '';
+
+    if(favEditIndex !== null){
+      settings.favorites[favEditIndex] = { name: name, url: url };
+    } else {
+      if(settings.favorites.length >= MAX_FAVORITES){ closeFavModal(); return; }
+      settings.favorites.push({ name: name, url: url });
+    }
+    saveSettings();
+    renderFavorites();
+    closeFavModal();
+  });
+
+  function removeFavorite(index){
+    settings.favorites.splice(index, 1);
+    saveSettings();
+    renderFavorites();
+  }
+
+  /* ============ CUSTOM RIGHT-CLICK MENU ============ */
+  var contextMenu = document.getElementById('context-menu');
+
+  function hideContextMenu(){
+    contextMenu.classList.remove('open');
+  }
+
+  function showContextMenu(x, y, items){
+    contextMenu.innerHTML = items.map(function(it){
+      return '<button class="'+(it.danger ? 'danger' : '')+'" data-action="'+it.action+'">'+ it.icon + '<span>'+ it.label +'</span></button>';
+    }).join('');
+
+    contextMenu.classList.add('open');
+    // measure, then clamp to viewport
+    var rect = contextMenu.getBoundingClientRect();
+    var maxX = window.innerWidth - rect.width - 10;
+    var maxY = window.innerHeight - rect.height - 10;
+    contextMenu.style.left = Math.max(10, Math.min(x, maxX)) + 'px';
+    contextMenu.style.top = Math.max(10, Math.min(y, maxY)) + 'px';
+  }
+
+  var ICON_RELOAD = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15a8 8 0 0014.9 2.5M19.5 9A8 8 0 004.6 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var ICON_SETTINGS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M4 12h1M19 12h1M12 4v1M12 19v1M6.3 6.3l.7.7M17 17l.7.7M17.7 6.3l-.7.7M7 17l-.7.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  var ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+  var ICON_REMOVE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+
+  document.addEventListener('contextmenu', function(e){
+    e.preventDefault();
+
+    var favItem = e.target.closest('.fav-item:not(.fav-add)');
+
+    if(favItem){
+      var idx = parseInt(favItem.dataset.index, 10);
+      showContextMenu(e.clientX, e.clientY, [
+        { action:'edit-fav', label:'Edit favorite', icon:ICON_EDIT },
+        { action:'remove-fav', label:'Remove favorite', icon:ICON_REMOVE, danger:true }
+      ]);
+      contextMenu.dataset.favIndex = idx;
+    } else {
+      showContextMenu(e.clientX, e.clientY, [
+        { action:'reload', label:'Reload page', icon:ICON_RELOAD },
+        { action:'settings', label:'Settings', icon:ICON_SETTINGS }
+      ]);
+      delete contextMenu.dataset.favIndex;
+    }
+  });
+
+  contextMenu.addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if(!btn) return;
+    var action = btn.dataset.action;
+    var idx = contextMenu.dataset.favIndex !== undefined ? parseInt(contextMenu.dataset.favIndex, 10) : null;
+
+    if(action === 'reload') window.location.reload();
+    else if(action === 'settings') openSettingsPanel();
+    else if(action === 'edit-fav') openFavModal('edit', idx);
+    else if(action === 'remove-fav') removeFavorite(idx);
+
+    hideContextMenu();
+  });
+
+  document.addEventListener('click', function(e){
+    if(!contextMenu.contains(e.target)) hideContextMenu();
+  });
+  document.addEventListener('scroll', hideContextMenu, true);
+  window.addEventListener('resize', hideContextMenu);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ hideContextMenu(); closeFavModal(); closeResults(); }
+  });
+
+  /* ============ PREMIUM ============ */
+  document.getElementById('premium-btn').addEventListener('click', function(){
+    window.open('https://lookit.xo.je/premium', '_blank');
+  });
+
+  /* ============ APPLY EVERYTHING ON LOAD ============ */
+  function applyAll(){
+    // clock mode
+    clockSeg.querySelectorAll('button').forEach(function(b){
+      b.classList.toggle('active', b.dataset.val === settings.clockMode);
+    });
+    renderClock();
+
+    // auto tz
+    tzSwitch.classList.toggle('on', !!settings.autoTZ);
+    requestAutoTZ();
+
+    // accent
+    document.documentElement.style.setProperty('--accent', settings.accent);
+    document.getElementById('hex-text').value = settings.accent;
+    document.getElementById('hex-picker').value = /^#([0-9a-f]{6})$/i.test(settings.accent) ? settings.accent : '#ffd400';
+    document.querySelectorAll('.swatch').forEach(function(s){
+      s.classList.toggle('selected', s.dataset.accent.toLowerCase() === settings.accent.toLowerCase());
+    });
+
+    // mode
+    modeSeg.querySelectorAll('button').forEach(function(b){
+      b.classList.toggle('active', b.dataset.val === settings.mode);
+    });
+    applyMode(settings.mode);
+
+    // background
+    if(settings.bgType && settings.bgType !== 'none' && settings.bgValue){
+      bgLayer.style.backgroundImage = 'url("'+settings.bgValue+'")';
+      document.body.classList.add('has-bg');
+    }
+
+    // favorites
+    if(!Array.isArray(settings.favorites)) settings.favorites = [];
+    renderFavorites();
+  }
+
+  applyAll();
+
+})();
+</script>
+</body>
+</html>
