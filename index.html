@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LookIt – Your favorite new tab.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0a06;
+    --surface:#151209;
+    --surface-2:#1c1810;
+    --line:rgba(255,212,0,0.12);
+    --yellow:#ffd400;
+    --yellow-dim:#c9a600;
+    --amber:#ff9900;
+    --text:#f5f2e6;
+    --text-dim:#a39c86;
+    --text-faint:#6b6555;
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,212,0,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,153,0,0.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--yellow); color:#141105; }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.04em; }
+
+  /* -------- NAV -------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(14px);
+    background:rgba(11,10,6,0.72);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:76px;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:1.25rem; letter-spacing:-0.01em;
+  }
+  .logo .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg, var(--yellow), var(--amber));
+    display:grid; place-items:center;
+    color:#141105; font-weight:700; font-size:0.95rem;
+    box-shadow:0 0 24px rgba(255,212,0,0.35);
+  }
+  .nav-links{ display:flex; align-items:center; gap:34px; }
+  .nav-links a{
+    font-size:0.92rem; color:var(--text-dim); font-weight:500;
+    transition:color .2s ease;
+  }
+  .nav-links a:hover{ color:var(--yellow); }
+  .nav-cta{
+    padding:10px 20px; border-radius:999px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.88rem;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .nav-cta:hover{ transform:translateY(-1px); box-shadow:0 6px 24px rgba(255,212,0,0.35); }
+  .nav-toggle{ display:none; }
+
+  /* -------- HERO -------- */
+  .hero{
+    position:relative;
+    padding:120px 0 100px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .beam{
+    position:absolute; top:0; left:-20%;
+    width:55%; height:180%;
+    background:linear-gradient(100deg, transparent, rgba(255,212,0,0.10) 40%, rgba(255,212,0,0.02) 60%, transparent);
+    transform:rotate(8deg);
+    animation:sweep 9s ease-in-out infinite;
+    z-index:-1;
+    pointer-events:none;
+  }
+  @keyframes sweep{
+    0%,100%{ transform:translateX(0) rotate(8deg); opacity:0.6; }
+    50%{ transform:translateX(65vw) rotate(8deg); opacity:1; }
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 14px; border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-size:0.8rem; color:var(--yellow);
+    font-weight:500;
+    margin-bottom:28px;
+  }
+  .badge .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 8px var(--yellow);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  .hero h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2.6rem, 6vw, 5.2rem);
+    line-height:1.02;
+    letter-spacing:-0.03em;
+    max-width:900px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(100deg, var(--yellow), var(--amber) 70%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p.lead{
+    margin-top:26px;
+    max-width:560px;
+    font-size:1.08rem;
+    line-height:1.65;
+    color:var(--text-dim);
+  }
+  .hero-actions{
+    margin-top:38px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .btn-primary{
+    padding:14px 26px; border-radius:10px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.95rem;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,212,0,0.3); }
+  .btn-ghost{
+    padding:14px 26px; border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-weight:600; font-size:0.95rem; color:var(--text);
+    transition:border-color .18s ease, background .18s ease;
+  }
+  .btn-ghost:hover{ border-color:rgba(255,212,0,0.4); background:var(--surface-2); }
+
+  .stats{
+    margin-top:72px;
+    display:grid; grid-template-columns:repeat(3, 1fr);
+    max-width:640px;
+    border-top:1px solid var(--line);
+    padding-top:32px;
+  }
+  .stats .stat{ padding-right:20px; }
+  .stats .num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:2.1rem; font-weight:700;
+    color:var(--yellow);
+  }
+  .stats .label{
+    margin-top:4px; font-size:0.82rem; color:var(--text-faint);
+  }
+
+  /* -------- SECTION HEADS -------- */
+  .section{ padding:100px 0; }
+  .section.alt{ background:linear-gradient(180deg, transparent, rgba(255,212,0,0.02), transparent); }
+  .eyebrow{
+    font-size:0.82rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--yellow-dim);
+    margin-bottom:14px;
+  }
+  .section h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight:700; letter-spacing:-0.02em;
+    max-width:560px;
+  }
+  .section p.sub{
+    margin-top:16px; max-width:560px;
+    color:var(--text-dim); line-height:1.65; font-size:1rem;
+  }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:24px; margin-bottom:52px;
+  }
+
+  /* -------- FEATURE GRID -------- */
+  .grid-3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    transition:transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(255,212,0,0.35);
+    background:var(--surface-2);
+  }
+  .card .icon{
+    width:42px; height:42px; border-radius:10px;
+    background:rgba(255,212,0,0.1);
+    display:grid; place-items:center;
+    color:var(--yellow); margin-bottom:20px;
+  }
+  .card h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.08rem; font-weight:600; margin-bottom:10px;
+  }
+  .card p{
+    font-size:0.92rem; line-height:1.6; color:var(--text-dim);
+  }
+
+  /* -------- VIDEO SHOWCASE -------- */
+  .video-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:22px;
+  }
+  .video-box{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .player{
+    position:relative;
+    aspect-ratio:16/10;
+    background:#000;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .player video{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .player .scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .25s ease;
+  }
+  .player.is-playing .scrim{ opacity:0; pointer-events:none; }
+  .play-btn{
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(255,212,0,0.94);
+    display:grid; place-items:center;
+    box-shadow:0 8px 30px rgba(255,212,0,0.4);
+    transition:transform .2s ease;
+  }
+  .player:hover .play-btn{ transform:scale(1.08); }
+  .play-btn svg{ width:20px; height:20px; margin-left:3px; }
+
+  .player-controls{
+    position:absolute; left:0; right:0; bottom:0;
+    padding:10px 12px 12px;
+    display:flex; align-items:center; gap:10px;
+    background:linear-gradient(0deg, rgba(0,0,0,0.75), transparent);
+    opacity:0; transform:translateY(6px);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .player:hover .player-controls, .player.is-playing .player-controls{
+    opacity:1; transform:translateY(0);
+  }
+  .ctrl-btn{
+    width:28px; height:28px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    display:grid; place-items:center; flex-shrink:0;
+    color:#fff; transition:background .15s ease;
+  }
+  .ctrl-btn:hover{ background:rgba(255,255,255,0.22); }
+  .ctrl-btn svg{ width:12px; height:12px; }
+  .progress{
+    flex:1; height:4px; border-radius:999px;
+    background:rgba(255,255,255,0.22);
+    position:relative; overflow:hidden;
+  }
+  .progress .fill{
+    position:absolute; left:0; top:0; bottom:0;
+    width:34%; border-radius:999px;
+    background:var(--yellow);
+  }
+  .time{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem; color:rgba(255,255,255,0.75);
+    flex-shrink:0;
+  }
+  .video-meta{ padding:20px; }
+  .video-meta .tag{
+    font-size:0.72rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--yellow-dim); margin-bottom:8px;
+  }
+  .video-meta h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1rem; font-weight:600; margin-bottom:6px;
+  }
+  .video-meta p{
+    font-size:0.86rem; color:var(--text-dim); line-height:1.55;
+  }
+
+  /* -------- CTA BAND -------- */
+  .cta-band{
+    margin:0 28px;
+    max-width:1124px; margin-inline:auto;
+    border-radius:24px;
+    padding:64px 48px;
+    text-align:center;
+    background:
+      radial-gradient(ellipse 500px 260px at 50% 0%, rgba(255,212,0,0.16), transparent 70%),
+      var(--surface);
+    border:1px solid var(--line);
+  }
+  .cta-band h2{ margin:0 auto 16px; }
+  .cta-band p.sub{ margin-inline:auto; }
+  .cta-band .hero-actions{ justify-content:center; margin-top:32px; }
+
+  /* -------- FOOTER -------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:56px 0 32px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns:1.4fr repeat(3, 1fr);
+    gap:40px;
+    padding-bottom:40px;
+  }
+  .footer-col h5{
+    font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-faint); margin-bottom:16px;
+  }
+  .footer-col a{
+    display:block; font-size:0.9rem; color:var(--text-dim);
+    margin-bottom:12px; transition:color .15s ease;
+  }
+  .footer-col a:hover{ color:var(--yellow); }
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:28px; border-top:1px solid var(--line);
+    font-size:0.82rem; color:var(--text-faint);
+    flex-wrap:wrap; gap:12px;
+  }
+
+  @media (max-width:860px){
+    .nav-links{ display:none; }
+    .grid-3, .video-grid{ grid-template-columns:1fr; }
+    .stats{ grid-template-columns:repeat(3,1fr); max-width:none; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+    .cta-band{ padding:48px 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .beam{ animation:none; }
+    .badge .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="mark">⌕</span>LookIt</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#tutorial">Tutorials</a>
+      <a href="#pricing">Start Using</a>
+    </div>
+    <a href="https://lookit.xo.je/search" class="nav-cta">Try LookIt!</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="beam"></div>
+  <div class="wrap">
+    <div class="badge"><span class="dot"></span> Last updated August 11, 2026.</div>
+    <h1>Welcome to <span class="accent">LookIt</span>, your new newtab.</h1>
+    <p class="lead">LookIt was designed to enhance digital productivity while keeping a fun and functional theme, as well as diving deeper by going through 3,000+ different free tools to assist you and provide the best, and most recent information.</p>
+    <div class="hero-actions">
+      <a href="https://lookit.xo.je/search" class="btn-primary">
+        Try LookIt
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#features" class="btn-ghost">Learn More</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="num">3K+</div>
+        <div class="label mono">Trusted sources</div>
+      </div>
+      <div class="stat">
+        <div class="num">4.9/5</div>
+        <div class="label mono">Site runtime</div>
+      </div>
+      <div class="stat">
+        <div class="num">99.5%</div>
+        <div class="label mono">Accurate, reliable information</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">About LookIt</div>
+        <h2>What Is LookIt?</h2>
+        <p class="sub">LookIt is a new tab designed to enhance distraction-free, ad-free, and limitless searching, without lacking on style.</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>Unlimited</h3>
+        <p>Enjoy searching, without pay-to-use or crappy ad-filled pages. </p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Any Time</h3>
+        <p>You can use this new tab at any time, don't let time-of-day get you down.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Trusted Sources</h3>
+        <p>LookIt uses 3,000+ different search tools to find the most accurate, recent, and backed results.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>No Storing</h3>
+        <p>We don't store your data, its yours for a reason, it all lives locally on your device.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>Favorites</h3>
+        <p>You can favorite your most visited/most used sites, right in your new tab.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12l4-4 4 4 6-6 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Premium</h3>
+        <p>We pay for this site out of pocket so you dont have to pay to use it! But it gets expensive... So we have premium! See benefits and price below.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="tutorial">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">How to use</div>
+        <h2>Tutorials</h2>
+        <p class="sub">Here you can see tutorials on our most asked questions..</p>
+      </div>
+    </div>
+
+    <div class="video-grid">
+
+      <div class="video-box">
+        <div class="player" data-player>
+          <video preload="metadata" poster="files/video1.png" playsinline>
+            <source src="files/video1.mp4" type="video/mp4">
+          </video>
+          <div class="scrim">
+            <div class="play-btn" data-play>
+              <svg viewBox="0 0 24 24" fill="#141105"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="player-controls">
+            <div class="ctrl-btn" data-play-mini>
+              <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="progress"><div class="fill" style="width:22%"></div></div>
+            <div class="time mono">0:42</div>
+          </div>
+        </div>
+        <div class="video-meta">
+          <div class="tag">8.11.2026</div>
+          <h4>How to set your new tab</h4>
+          <p>Heres a step-by-step tutorial on how to use LookIt as your new tab!</p>
+        </div>
+      </div>
+
+      <div class="video-box">
+        <div class="player" data-player>
+          <video preload="metadata" poster="files/video2.png" playsinline>
+            <source src="files/video2.mp4" type="video/mp4">
+          </video>
+          <div class="scrim">
+            <div class="play-btn" data-play>
+              <svg viewBox="0 0 24 24" fill="#141105"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="player-controls">
+            <div class="ctrl-btn" data-play-mini>
+              <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="progress"><div class="fill" style="width:58%"></div></div>
+            <div class="time mono">1:17</div>
+          </div>
+        </div>
+        <div class="video-meta">
+          <div class="tag">8.11.2026</div>
+          <h4>How to customize LookIt</h4>
+          <p>Heres a step-by-step tutorial on how to customize LookIt!</p>
+        </div>
+      </div>
+
+      <div class="video-box">
+        <div class="player" data-player>
+          <video preload="metadata" poster="files/video3.png" playsinline>
+            <source src="files/video3.mp4" type="video/mp4">
+          </video>
+          <div class="scrim">
+            <div class="play-btn" data-play>
+              <svg viewBox="0 0 24 24" fill="#141105"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+          <div class="player-controls">
+            <div class="ctrl-btn" data-play-mini>
+              <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="progress"><div class="fill" style="width:9%"></div></div>
+            <div class="time mono">0:08</div>
+          </div>
+        </div>
+        <div class="video-meta">
+          <div class="tag">8.11.2026</div>
+          <h4>How to recieve support</h4>
+          <p>Heres a step-by-step tutorial on how to contact my team for support!</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="cta-band">
+      <div class="eyebrow" style="justify-content:center; display:flex;">like what you see?</div>
+      <h2>Try LookIt today!</h2>
+      <p class="sub">It's free, it's custom, its LookIt.</p>
+      <div class="hero-actions">
+        <a href="https://lookit.xo.je/search" class="btn-primary">
+          Search with LookIt
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="https://lookit.xo.je/premium" class="btn-ghost">Buy LookIt Premium</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="faq">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo"><span class="mark">⌕</span>LookIt</div>
+        <p style="margin-top:16px; font-size:0.88rem; color:var(--text-dim); line-height:1.6; max-width:260px;">
+          The free, ad-less, seamless, unlimited search tool.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h5>Info</h5>
+        <a href="https://lookit-up.github.io/lookit-up">About Me</a>
+        <a href="https://lookit-up.github.io/my-projects">My Projects</a>
+        <a href="https://lookit-up.github.io/socials">My Socials</a>
+      </div>
+      <div class="footer-col">
+        <h5>Site Map</h5>
+        <a href="https://lookit.xo.je/">About LookIt</a>
+        <a href="https://lookit.xo.je/search">LookIt Search</a>
+        <a href="https://lookit.xo.je/">Credits</a>
+      </div>
+      <div class="footer-col">
+        <h5>Tools</h5>
+        <a href="https://lookit.xo.je/tools">Tools Used</a>
+        <a href="https://lookit.xo.je/promos">Promos</a>
+        <a href="https://lookit.xo.je/partners">Partners</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="mono">© 2026 LookIt — your favorite new tab</div>
+      <div class="mono"><a href="https://github.com/lookit-up/lookit">GitHub</a> / <a href="https://lookit-up.github.io/lookit">Backup</a> / <a href="https://lookit-up.github.io/lookit-up">About Me</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-player]').forEach(function(player){
+    var video = player.querySelector('video');
+    var playBtns = player.querySelectorAll('[data-play], [data-play-mini]');
+
+    function togglePlay(e){
+      e.stopPropagation();
+      if(video.paused){
+        video.play().catch(function(){ /* no source file present in this demo */ });
+        player.classList.add('is-playing');
+      } else {
+        video.pause();
+        player.classList.remove('is-playing');
+      }
+    }
+
+    playBtns.forEach(function(btn){
+      btn.addEventListener('click', togglePlay);
+    });
+
+    player.addEventListener('click', function(){
+      if(!video.paused){
+        video.pause();
+        player.classList.remove('is-playing');
+      }
+    });
+
+    video.addEventListener('ended', function(){
+      player.classList.remove('is-playing');
+    });
+  });
+</script>
+
+</body>
+</html>
