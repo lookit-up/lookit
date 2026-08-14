@@ -960,7 +960,7 @@
   var TAVILY_API_KEY     = "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";      // general web queries + news
   var AUDIODB_API_KEY    = "123";  // songs
   var TMDB_API_KEY       = "a319cd84a2bfc1837bd810837b142dc0";         // movies
-  var OPENROUTER_MODEL   = "openai/gpt-4o-mini";
+  var OPENROUTER_MODEL = "openrouter/free";
 
   // ---- fill these in with your Supabase project's values ----
   var SUPABASE_URL       = "YOUR_SUPABASE_URL";       // e.g. "https://xxxxxxxx.supabase.co"
@@ -1105,7 +1105,7 @@
 
   /* ---- intent classification via OpenRouter ---- */
   function classifyQuery(q){
-    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY'){
+    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY === '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'){
       return Promise.resolve({ type:'query', q:q });
     }
     var sys = 'Classify the user search into exactly one type: "song", "movie", "image", or "query". ' +
@@ -1146,7 +1146,7 @@
   /* ---- query -> Tavily ---- */
   function handleQuery(intent, original){
     var q = intent.q || original;
-    if(!TAVILY_API_KEY || TAVILY_API_KEY === 'YOUR_TAVILY_API_KEY'){ fallbackGoogle(q); return; }
+    if(!TAVILY_API_KEY || TAVILY_API_KEY === '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'){ fallbackGoogle(q); return; }
 
     fetch('https://api.tavily.com/search', {
       method:'POST',
@@ -1182,7 +1182,7 @@
   function handleSong(intent, original){
     var artist = intent.artist || '';
     var track = intent.track || intent.q || original;
-    if(!AUDIODB_API_KEY || AUDIODB_API_KEY === 'YOUR_THEAUDIODB_API_KEY'){ fallbackGoogle((artist+' '+track).trim()); return; }
+    if(!AUDIODB_API_KEY || AUDIODB_API_KEY === '123'){ fallbackGoogle((artist+' '+track).trim()); return; }
 
     var url = 'https://theaudiodb.com/api/v1/json/'+ AUDIODB_API_KEY +'/searchtrack.php?s='+ encodeURIComponent(artist) +'&t='+ encodeURIComponent(track);
 
@@ -1213,7 +1213,7 @@
   /* ---- image -> Pexels ---- */
   function handleImage(intent, original){
     var q = intent.q || original;
-    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'YOUR_PEXELS_API_KEY'){ fallbackGoogleImages(q); return; }
+    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'SlWAxNKS5AJ0LAHuM0lYw12is76cCpcJWbw3aL5aUgnbFfymXoioZLb1'){ fallbackGoogleImages(q); return; }
 
     fetch('https://api.pexels.com/v1/search?query='+ encodeURIComponent(q) +'&per_page=9', {
       headers:{ Authorization: PEXELS_API_KEY }
@@ -1241,7 +1241,7 @@
   /* ---- movie -> TheMovieDB ---- */
   function handleMovie(intent, original){
     var q = intent.q || original;
-    if(!TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY'){ fallbackGoogle(q); return; }
+    if(!TMDB_API_KEY || TMDB_API_KEY === '0aa1284c2c630a89b5facb287d57a0f3'){ fallbackGoogle(q); return; }
 
     fetch('https://api.themoviedb.org/3/search/movie?api_key='+ TMDB_API_KEY +'&query='+ encodeURIComponent(q))
       .then(function(res){
