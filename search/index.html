@@ -76,6 +76,7 @@
   .clock{
     text-align:center;
     user-select:none;
+    transition:left .05s linear, top .05s linear;
   }
   .clock .time{
     font-family:'Space Grotesk', sans-serif;
@@ -350,10 +351,22 @@
   #settings-btn.active{ color:var(--accent); border-color:var(--accent); }
   #settings-btn svg{ width:19px; height:19px; transition:transform .3s ease; }
 
+  /* ---------- account button (top right, always visible) ---------- */
+  #account-btn{
+    position:fixed; right:22px; top:22px; z-index:41;
+    width:44px; height:44px; border-radius:50%;
+    background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow);
+    display:grid; place-items:center; color:var(--text-dim); cursor:pointer; overflow:hidden;
+    transition:border-color .2s ease, transform .18s ease;
+  }
+  #account-btn:hover{ border-color:var(--accent); transform:translateY(-2px); }
+  #account-btn img{ width:100%; height:100%; object-fit:cover; display:none; }
+  #account-btn.active{ border-color:var(--accent); }
+
   /* ---------- settings panel ---------- */
   #panel{
     position:fixed; left:22px; bottom:80px; z-index:42;
-    width:380px; max-width:88vw; max-height:min(620px, 76vh);
+    width:380px; max-width:88vw; max-height:min(660px, 78vh);
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:18px;
@@ -492,12 +505,8 @@
     font-size:0.82rem; outline:none;
   }
   .bg-custom input[type="text"]:focus{ border-color:var(--accent); }
-  .file-btn{
-    position:relative; overflow:hidden;
-  }
-  .file-btn input[type="file"]{
-    position:absolute; inset:0; opacity:0; cursor:pointer;
-  }
+  .file-btn{ position:relative; overflow:hidden; }
+  .file-btn input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
 
   .reset-btn{
     width:100%; margin-top:22px; padding:11px; border-radius:10px;
@@ -515,20 +524,14 @@
   }
   .erase-btn:hover{ background:rgba(224,85,95,0.16); transform:translateY(-1px); }
 
-  .premium-card{
-    text-align:center; padding:22px 10px 8px;
-  }
+  .premium-card{ text-align:center; padding:22px 10px 8px; }
   .premium-card .icon{
     width:46px; height:46px; border-radius:12px; margin:0 auto 14px;
     background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ff8a00));
     display:grid; place-items:center; color:var(--accent-ink);
   }
-  .premium-card h4{
-    font-family:'Space Grotesk', sans-serif; font-size:1rem; margin-bottom:8px;
-  }
-  .premium-card p{
-    font-size:0.82rem; color:var(--text-dim); line-height:1.55; margin-bottom:18px;
-  }
+  .premium-card h4{ font-family:'Space Grotesk', sans-serif; font-size:1rem; margin-bottom:8px; }
+  .premium-card p{ font-size:0.82rem; color:var(--text-dim); line-height:1.55; margin-bottom:18px; }
   .premium-btn{
     display:inline-flex; align-items:center; gap:8px;
     padding:11px 24px; border-radius:10px;
@@ -537,6 +540,118 @@
     transition:transform .18s ease, box-shadow .18s ease;
   }
   .premium-btn:hover{ transform:translateY(-2px); box-shadow:0 8px 22px color-mix(in srgb, var(--accent) 45%, transparent); }
+
+  /* ---------- premium sub-tabs (auth / hub) ---------- */
+  .subtabs{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .subtab-btn{
+    padding:7px 12px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2);
+    color:var(--text-dim); font-size:0.76rem; font-weight:600; cursor:pointer;
+    transition:border-color .16s ease, color .16s ease, background .16s ease;
+  }
+  .subtab-btn.active{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+  .subpane{ display:none; }
+  .subpane.active{ display:block; animation:fadeIn .2s ease; }
+
+  /* ---------- auth forms ---------- */
+  .auth-box{ display:flex; flex-direction:column; gap:10px; }
+  .auth-box input{
+    padding:10px 12px; border-radius:9px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-size:0.86rem; outline:none;
+  }
+  .auth-box input:focus{ border-color:var(--accent); }
+  .auth-error{ font-size:0.78rem; color:#e0555f; min-height:1em; }
+  .auth-btn{
+    padding:11px; border-radius:9px; background:var(--accent); color:var(--accent-ink);
+    font-weight:700; font-size:0.86rem; border:none; cursor:pointer;
+    transition:transform .16s ease;
+  }
+  .auth-btn:hover{ transform:translateY(-1px); }
+  .need-premium-box{ text-align:center; padding:20px 6px; }
+  .need-premium-box p{ font-size:0.86rem; color:var(--text-dim); line-height:1.6; margin-bottom:14px; }
+
+  /* ---------- profile editor ---------- */
+  .profile-head{ display:flex; flex-direction:column; margin-bottom:26px; }
+  .banner-preview{
+    width:100%; height:88px; border-radius:12px; background:var(--surface-2) center/cover no-repeat;
+    position:relative; margin-bottom:-30px; overflow:visible; border:1px solid var(--line);
+  }
+  .avatar-preview{
+    width:60px; height:60px; border-radius:50%; border:3px solid var(--surface);
+    background:var(--surface-2) center/cover no-repeat; margin-left:16px; position:relative;
+  }
+  .upload-mini{
+    position:absolute; bottom:0; right:0; width:20px; height:20px; border-radius:50%;
+    background:var(--accent); color:var(--accent-ink); display:grid; place-items:center; cursor:pointer; overflow:hidden;
+  }
+  .upload-mini input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+
+  /* ---------- widget dock ---------- */
+  #widget-dock{
+    position:fixed; right:22px; top:80px; z-index:41;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .dock-btn{
+    width:40px; height:40px; border-radius:12px; font-size:1.05rem;
+    background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow);
+    display:grid; place-items:center; color:var(--text-dim); cursor:pointer;
+    transition:border-color .18s ease, transform .16s ease;
+  }
+  .dock-btn:hover{ border-color:var(--accent); transform:translateY(-2px); }
+
+  /* ---------- widget panels ---------- */
+  .widget-panel{
+    position:fixed; z-index:45; width:320px; max-height:440px;
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden;
+    transform:translate(-50%,-50%);
+  }
+  .widget-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:12px 14px; border-bottom:1px solid var(--line); cursor:move; flex-shrink:0;
+    font-weight:600; font-size:0.86rem;
+  }
+  .widget-close{
+    width:22px; height:22px; border-radius:50%; border:1px solid var(--line); background:var(--surface-2);
+    color:var(--text-dim); display:grid; place-items:center; cursor:pointer; flex-shrink:0;
+  }
+  .widget-close:hover{ color:#e0555f; border-color:#e0555f; }
+  .widget-body{ padding:14px; overflow-y:auto; flex:1; font-size:0.84rem; }
+
+  /* chat (AI + friends) */
+  .chat-thread{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; max-height:260px; overflow-y:auto; }
+  .chat-bubble{ padding:8px 12px; border-radius:12px; font-size:0.82rem; line-height:1.45; max-width:85%; }
+  .chat-bubble.me{ align-self:flex-end; background:var(--accent); color:var(--accent-ink); }
+  .chat-bubble.them{ align-self:flex-start; background:var(--surface-2); color:var(--text); }
+  .chat-input-row{ display:flex; gap:8px; }
+  .chat-input-row input{
+    flex:1; padding:9px 12px; border-radius:9px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-size:0.82rem; outline:none;
+  }
+  .chat-input-row input:focus{ border-color:var(--accent); }
+  .chat-input-row button{
+    padding:9px 14px; border-radius:9px; background:var(--accent); color:var(--accent-ink);
+    border:none; font-weight:700; cursor:pointer; font-size:0.8rem;
+  }
+
+  /* friends list / requests */
+  .friend-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); cursor:pointer; }
+  .friend-row:last-child{ border-bottom:none; }
+  .friend-row img{ width:28px; height:28px; border-radius:50%; object-fit:cover; background:var(--surface-2); flex-shrink:0; }
+  .friend-row .fr-name{ font-size:0.84rem; font-weight:600; flex:1; }
+  .friend-row .fr-actions{ display:flex; gap:6px; }
+  .fr-btn{ font-size:0.7rem; padding:5px 8px; border-radius:6px; border:1px solid var(--line); background:var(--surface-2); color:var(--text-dim); cursor:pointer; }
+  .fr-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .fr-btn.accept{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+  .friend-search-row{ display:flex; gap:8px; margin-bottom:12px; }
+  .friend-search-row input{
+    flex:1; padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+    background:var(--surface-2); color:var(--text); font-size:0.8rem; outline:none;
+  }
+
+  /* layout drag-to-move mode */
+  .draggable-el{ outline:2px dashed var(--accent); outline-offset:6px; cursor:move !important; border-radius:14px; }
+
+  @media (prefers-reduced-motion: reduce){ }
 </style>
 </head>
 <body>
@@ -545,12 +660,12 @@
 <div id="bg-scrim"></div>
 
 <div class="stage">
-  <div class="clock">
+  <div class="clock" id="clock-el">
     <div class="time" id="clock-time"></div>
     <div class="date" id="clock-date"></div>
   </div>
 
-  <div class="search-wrap">
+  <div class="search-wrap" id="search-wrap-el">
     <form class="search-bar" id="search-form">
       <svg class="search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       <div class="spinner"></div>
@@ -587,6 +702,13 @@
 <button id="settings-btn" aria-label="Settings">
   <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 00.33 1.87l.06.06a2.06 2.06 0 11-2.92 2.92l-.06-.06a1.7 1.7 0 00-1.87-.33 1.7 1.7 0 00-1.03 1.56V20a2.06 2.06 0 01-4.12 0v-.09A1.7 1.7 0 008.7 18.3a1.7 1.7 0 00-1.87.33l-.06.06a2.06 2.06 0 11-2.92-2.92l.06-.06a1.7 1.7 0 00.33-1.87 1.7 1.7 0 00-1.56-1.03H2.6a2.06 2.06 0 010-4.12h.09A1.7 1.7 0 004.3 8.7a1.7 1.7 0 00-.33-1.87l-.06-.06a2.06 2.06 0 112.92-2.92l.06.06a1.7 1.7 0 001.87.33H8.8A1.7 1.7 0 0010.4 2.6V2.5a2.06 2.06 0 014.12 0v.09a1.7 1.7 0 001.03 1.56 1.7 1.7 0 001.87-.33l.06-.06a2.06 2.06 0 112.92 2.92l-.06.06a1.7 1.7 0 00-.33 1.87v.1c.2.67.78 1.16 1.56 1.16h.09a2.06 2.06 0 010 4.12h-.09a1.7 1.7 0 00-1.56 1.03z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
 </button>
+
+<button id="account-btn" aria-label="Account">
+  <svg id="account-btn-icon" width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 12a4.5 4.5 0 100-9 4.5 4.5 0 000 9z" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c1.7-3.6 4.6-5.4 8-5.4s6.3 1.8 8 5.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  <img id="account-btn-avatar" alt="">
+</button>
+
+<div id="widget-dock"></div>
 
 <div id="panel">
   <div class="tabs">
@@ -683,32 +805,170 @@
     </div>
 
     <div class="tab-pane" data-pane="premium">
-      <div class="premium-card">
-        <div class="icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7L12 2z" fill="currentColor"/></svg>
+
+      <!-- logged out -->
+      <div id="auth-section">
+        <div class="premium-card" style="padding-top:6px; padding-bottom:6px;">
+          <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7L12 2z" fill="currentColor"/></svg>
+          </div>
+          <h4>LookIt Premium</h4>
+          <p>Sign in to sync your settings, unlock full layout control, widgets, and friends across every device.</p>
+          <button class="premium-btn" id="intro-upgrade-btn">
+            Get Premium
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
-        <h4>Go premium</h4>
-        <p>Unlock more themes, unlimited custom backgrounds, and sync across your devices.</p>
-        <button class="premium-btn" id="premium-btn">
-          Upgrade now
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+
+        <div class="subtabs" id="auth-subtabs">
+          <button class="subtab-btn active" data-auth="signin">Sign in</button>
+          <button class="subtab-btn" data-auth="signup">Sign up</button>
+        </div>
+
+        <div class="auth-box" id="signin-pane" style="display:flex;">
+          <input type="email" id="signin-email" placeholder="Email">
+          <input type="password" id="signin-password" placeholder="Password">
+          <div class="auth-error" id="signin-error"></div>
+          <button class="auth-btn" id="signin-btn">Sign in</button>
+        </div>
+
+        <div class="auth-box" id="signup-pane" style="display:none;">
+          <input type="email" id="signup-email" placeholder="Email">
+          <input type="password" id="signup-password" placeholder="Password (min 6 characters)">
+          <div class="auth-error" id="signup-error"></div>
+          <button class="auth-btn" id="signup-btn">Create account</button>
+        </div>
       </div>
+
+      <!-- logged in, not premium -->
+      <div id="need-premium-section" style="display:none;">
+        <div class="need-premium-box">
+          <div class="icon" style="margin:0 auto 14px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7L12 2z" fill="currentColor"/></svg>
+          </div>
+          <h4 style="font-family:'Space Grotesk',sans-serif; margin-bottom:8px; font-size:1rem;">You need Premium to use an account</h4>
+          <p>Your account was signed out because Premium isn't active on it yet. Upgrade to unlock accounts, sync, widgets, and friends.</p>
+          <button class="premium-btn" id="need-premium-upgrade-btn">
+            Upgrade now
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- logged in + premium -->
+      <div id="account-hub" style="display:none;">
+
+        <div class="profile-head">
+          <div class="banner-preview" id="banner-preview">
+            <div class="upload-mini" style="bottom:auto; top:6px; right:6px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <input type="file" id="banner-file-input" accept="image/*">
+            </div>
+          </div>
+          <div class="avatar-preview" id="avatar-preview">
+            <div class="upload-mini">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+              <input type="file" id="avatar-file-input" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <div class="subtabs" id="hub-subtabs">
+          <button class="subtab-btn active" data-hub="profile">Profile</button>
+          <button class="subtab-btn" data-hub="layout">Layout</button>
+          <button class="subtab-btn" data-hub="widgets">Widgets</button>
+          <button class="subtab-btn" data-hub="friends">Friends</button>
+          <button class="subtab-btn" data-hub="data">Data</button>
+        </div>
+
+        <div class="subpane active" data-hubpane="profile">
+          <div class="modal-field"><label>Username</label><input type="text" id="username-input" maxlength="20" placeholder="username"></div>
+          <div class="row-sub" id="username-status" style="margin:-6px 0 10px;"></div>
+          <div class="modal-field"><label>Display name</label><input type="text" id="displayname-input" maxlength="30"></div>
+          <div class="modal-field"><label>Bio</label><input type="text" id="bio-input" maxlength="140" placeholder="Say something about yourself"></div>
+          <button class="mini-btn" id="save-profile-btn" style="margin-top:4px;">Save profile</button>
+          <button class="reset-btn" id="logout-btn" style="margin-top:24px;">Log out</button>
+        </div>
+
+        <div class="subpane" data-hubpane="layout">
+          <div class="row">
+            <div><div class="row-label">Custom layout</div><div class="row-sub">Freely drag the clock &amp; search bar</div></div>
+            <div class="switch" id="custom-layout-switch"></div>
+          </div>
+          <div class="row-sub" style="margin:12px 0 6px;">Clock size</div>
+          <input type="range" id="clock-scale" min="0.6" max="1.8" step="0.05" style="width:100%;">
+          <div class="row-sub" style="margin:14px 0 6px;">Search bar size</div>
+          <input type="range" id="search-scale" min="0.7" max="1.6" step="0.05" style="width:100%;">
+          <button class="mini-btn" id="edit-layout-btn" style="margin-top:16px; width:100%;">Toggle drag-to-move mode</button>
+          <div class="row-sub" style="margin-top:10px;">When drag-to-move is on and custom layout is enabled, click and drag the clock or search bar anywhere on the page.</div>
+        </div>
+
+        <div class="subpane" data-hubpane="widgets">
+          <div class="row"><div><div class="row-label">📰 News summary</div><div class="row-sub">AI-summarized headlines</div></div><div class="switch" id="widget-news-switch"></div></div>
+          <div class="row"><div><div class="row-label">🌤️ Weather</div><div class="row-sub">Local conditions</div></div><div class="switch" id="widget-weather-switch"></div></div>
+          <div class="row"><div><div class="row-label">🤖 AI companion</div><div class="row-sub">A private AI you can talk to</div></div><div class="switch" id="widget-ai-switch"></div></div>
+          <div class="row"><div><div class="row-label">📅 Calendar</div><div class="row-sub">Embed your Google Calendar</div></div><div class="switch" id="widget-calendar-switch"></div></div>
+          <div class="row"><div><div class="row-label">👥 Friends &amp; chat</div><div class="row-sub">Message your friends</div></div><div class="switch" id="widget-friends-switch"></div></div>
+
+          <div class="section-title">AI companion</div>
+          <div class="modal-field"><label>Name</label><input type="text" id="ai-name-input" maxlength="20" placeholder="Nova"></div>
+          <div class="modal-field"><label>Personality</label><input type="text" id="ai-personality-input" maxlength="200" placeholder="Warm, curious, a little sarcastic"></div>
+          <button class="mini-btn" id="save-ai-btn">Save AI companion</button>
+
+          <div class="section-title">Calendar</div>
+          <div class="modal-field"><label>Google Calendar embed URL</label><input type="text" id="calendar-url-input" placeholder="https://calendar.google.com/calendar/embed?src=..."></div>
+          <button class="mini-btn" id="save-calendar-btn">Save calendar</button>
+        </div>
+
+        <div class="subpane" data-hubpane="friends">
+          <div class="friend-search-row">
+            <input type="text" id="friend-search-input" placeholder="Search by username">
+            <button class="mini-btn" id="friend-search-btn">Search</button>
+          </div>
+          <div id="friend-search-results"></div>
+          <div class="section-title">Requests</div>
+          <div id="friend-requests-list"><div class="row-sub">No pending requests</div></div>
+          <div class="section-title">Your friends</div>
+          <div id="friends-list"><div class="row-sub">No friends yet</div></div>
+        </div>
+
+        <div class="subpane" data-hubpane="data">
+          <div class="row">
+            <div><div class="row-label">Export data</div><div class="row-sub">Download all your settings as JSON</div></div>
+            <button class="mini-btn" id="export-btn">Export</button>
+          </div>
+          <div class="row">
+            <div><div class="row-label">Import data</div><div class="row-sub">Restore settings from a JSON file</div></div>
+            <button class="mini-btn file-btn">Import<input type="file" id="import-file-input" accept="application/json"></button>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 
   /* ============ CONFIG ============ */
-  var PEXELS_API_KEY     = "Da0j8H8sQz3ICuWzsVX9pPxbmvOhsTMa7joMG54dF7BnYtWYn6mOGcZz";      // used for background search + image results
-  var OPENROUTER_API_KEY = "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";  // classifies query intent
-  var TAVILY_API_KEY     = "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";      // general web queries
+  var PEXELS_API_KEY     = "Da0j8H8sQz3ICuWzsVX9pPxbmvOhsTMa7joMG54dF7BnYtWYn6mOGcZz";      // background search + image results
+  var OPENROUTER_API_KEY = "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";  // classifies query intent + AI companion + news summary
+  var TAVILY_API_KEY     = "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";      // general web queries + news
   var AUDIODB_API_KEY    = "123";  // songs
   var TMDB_API_KEY       = "a319cd84a2bfc1837bd810837b142dc0";         // movies
   var OPENROUTER_MODEL   = "openai/gpt-4o-mini";
+
+  // ---- fill these in with your Supabase project's values ----
+  var SUPABASE_URL       = "https://gfymxmyekkzgfpmelwrv.supabase.co";       // e.g. "https://gfymxmyekkzgfpmelwrv.supabase.co"
+  var SUPABASE_ANON_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmeW14bXlla2t6Z2ZwbWVsd3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDg2MjIsImV4cCI6MjEwMjIyNDYyMn0.P_wA6t0ZZ1_55EmDIESZihlP3FH0tX4UnUtEJQj3zG0";  // the public "anon" key, safe for client-side use
+
+  var supabase = (window.supabase && SUPABASE_URL.indexOf('YOUR_') !== 0)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
   var STORAGE_KEY = "ntab_settings_v1";
   var GOOGLE_SEARCH = "https://www.google.com/search?q=";
@@ -721,10 +981,37 @@
     mode: "light",
     bgType: "none",   // none | url | data
     bgValue: "",
-    favorites: []     // [{ name, url }]
+    favorites: [],    // [{ name, url }]
+
+    // premium: layout
+    layout: {
+      customEnabled: false,
+      clock: { x: 50, y: 40 },
+      search: { x: 50, y: 58 },
+      clockScale: 1,
+      searchScale: 1
+    },
+
+    // premium: widgets
+    widgets: {
+      news:     { enabled:false, x:78, y:16 },
+      weather:  { enabled:false, x:22, y:16 },
+      ai:       { enabled:false, x:78, y:50 },
+      calendar: { enabled:false, x:22, y:50 },
+      friends:  { enabled:false, x:50, y:78 }
+    },
+
+    // premium: AI companion
+    ai: { name: "Nova", personality: "Warm, curious, and a little playful. Keeps replies short and conversational." },
+
+    calendarEmbedUrl: ""
   };
 
   var settings = Object.assign({}, defaults, loadSettings());
+  // deep-merge nested objects since a saved copy may only have partial keys
+  settings.layout = Object.assign({}, defaults.layout, settings.layout || {});
+  settings.widgets = Object.assign({}, defaults.widgets, settings.widgets || {});
+  settings.ai = Object.assign({}, defaults.ai, settings.ai || {});
 
   function loadSettings(){
     try{
@@ -732,13 +1019,21 @@
       return raw ? JSON.parse(raw) : {};
     }catch(e){ return {}; }
   }
-  function saveSettings(){
+  function saveSettingsRaw(){
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); }catch(e){}
+  }
+  // saveSettings also queues a cloud sync when the user is signed in with premium
+  function saveSettings(){
+    saveSettingsRaw();
+    queueCloudSave();
   }
 
   /* ============ CLOCK ============ */
   var timeEl = document.getElementById('clock-time');
   var dateEl = document.getElementById('clock-date');
+  var clockEl = document.getElementById('clock-el');
+  var searchWrapEl = document.getElementById('search-wrap-el');
+  var stageEl = document.querySelector('.stage');
 
   function pad(n){ return n < 10 ? '0'+n : ''+n; }
 
@@ -802,9 +1097,15 @@
       '</button></div>';
   }
 
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
   /* ---- intent classification via OpenRouter ---- */
   function classifyQuery(q){
-    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_API_KEY'){
+    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY === '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'){
       return Promise.resolve({ type:'query', q:q });
     }
     var sys = 'Classify the user search into exactly one type: "song", "movie", "image", or "query". ' +
@@ -845,7 +1146,7 @@
   /* ---- query -> Tavily ---- */
   function handleQuery(intent, original){
     var q = intent.q || original;
-    if(!TAVILY_API_KEY || TAVILY_API_KEY === 'YOUR_TAVILY_API_KEY'){ fallbackGoogle(q); return; }
+    if(!TAVILY_API_KEY || TAVILY_API_KEY === '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'){ fallbackGoogle(q); return; }
 
     fetch('https://api.tavily.com/search', {
       method:'POST',
@@ -881,7 +1182,7 @@
   function handleSong(intent, original){
     var artist = intent.artist || '';
     var track = intent.track || intent.q || original;
-    if(!AUDIODB_API_KEY || AUDIODB_API_KEY === 'YOUR_THEAUDIODB_API_KEY'){ fallbackGoogle((artist+' '+track).trim()); return; }
+    if(!AUDIODB_API_KEY || AUDIODB_API_KEY === '123'){ fallbackGoogle((artist+' '+track).trim()); return; }
 
     var url = 'https://theaudiodb.com/api/v1/json/'+ AUDIODB_API_KEY +'/searchtrack.php?s='+ encodeURIComponent(artist) +'&t='+ encodeURIComponent(track);
 
@@ -912,7 +1213,7 @@
   /* ---- image -> Pexels ---- */
   function handleImage(intent, original){
     var q = intent.q || original;
-    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'YOUR_PEXELS_API_KEY'){ fallbackGoogleImages(q); return; }
+    if(!PEXELS_API_KEY || PEXELS_API_KEY === 'SlWAxNKS5AJ0LAHuM0lYw12is76cCpcJWbw3aL5aUgnbFfymXoioZLb1'){ fallbackGoogleImages(q); return; }
 
     fetch('https://api.pexels.com/v1/search?query='+ encodeURIComponent(q) +'&per_page=9', {
       headers:{ Authorization: PEXELS_API_KEY }
@@ -940,7 +1241,7 @@
   /* ---- movie -> TheMovieDB ---- */
   function handleMovie(intent, original){
     var q = intent.q || original;
-    if(!TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY'){ fallbackGoogle(q); return; }
+    if(!TMDB_API_KEY || TMDB_API_KEY === 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYWExMjg0YzJjNjMwYTg5YjVmYWNiMjg3ZDU3YTBmMyIsIm5iZiI6MTc4NjY1NTQ3NS4wMjgsInN1YiI6IjZhN2UzMmYzZDBkNDFlYzEwODE4MTY4NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.P5nEQpiBJ-HVizJEMj0CQJAOnmYpbnRVbk9f9hxMhwA'){ fallbackGoogle(q); return; }
 
     fetch('https://api.themoviedb.org/3/search/movie?api_key='+ TMDB_API_KEY +'&query='+ encodeURIComponent(q))
       .then(function(res){
@@ -967,12 +1268,6 @@
       })
       .catch(function(){ fallbackGoogle(q); })
       .finally(function(){ setLoading(false); });
-  }
-
-  function escapeHtml(s){
-    var d = document.createElement('div');
-    d.textContent = s == null ? '' : String(s);
-    return d.innerHTML;
   }
 
   searchForm.addEventListener('submit', function(e){
@@ -1025,10 +1320,17 @@
   document.addEventListener('click', function(e){
     if(panel.classList.contains('open') &&
        !panel.contains(e.target) &&
-       !settingsBtn.contains(e.target)){
+       !settingsBtn.contains(e.target) &&
+       !e.target.closest('#account-btn')){
       panel.classList.remove('open');
       settingsBtn.classList.remove('active');
     }
+  });
+
+  /* ============ ACCOUNT BUTTON ============ */
+  document.getElementById('account-btn').addEventListener('click', function(){
+    openSettingsPanel();
+    document.querySelector('.tab-btn[data-tab="premium"]').click();
   });
 
   /* ============ TABS ============ */
@@ -1259,12 +1561,6 @@
     }
   }
 
-  function escapeHtml(s){
-    var d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
   function openFavModal(mode, index){
     favEditIndex = (mode === 'edit') ? index : null;
     favModalTitle.textContent = (mode === 'edit') ? 'Edit favorite' : 'Add favorite';
@@ -1327,7 +1623,6 @@
     }).join('');
 
     contextMenu.classList.add('open');
-    // measure, then clamp to viewport
     var rect = contextMenu.getBoundingClientRect();
     var maxX = window.innerWidth - rect.width - 10;
     var maxY = window.innerHeight - rect.height - 10;
@@ -1384,9 +1679,841 @@
     if(e.key === 'Escape'){ hideContextMenu(); closeFavModal(); closeResults(); }
   });
 
-  /* ============ PREMIUM ============ */
-  document.getElementById('premium-btn').addEventListener('click', function(){
+
+  /* ================================================================
+     PREMIUM: ACCOUNTS, SYNC, LAYOUT, WIDGETS, FRIENDS
+     Everything below only takes effect for a signed-in user whose
+     Supabase profile has premium = true.
+     ================================================================ */
+
+  var currentUser = null;
+  var currentProfile = null;
+  var cloudSaveTimer = null;
+  var activeChatFriend = null;
+  var aiHistory = [];
+  var realtimeChannel = null;
+
+  function requireSupabase(){
+    if(!supabase){
+      alert("Supabase isn't configured yet. Add your project URL and anon key in the code.");
+      return false;
+    }
+    return true;
+  }
+
+  function isPremiumActive(){
+    return !!(currentUser && currentProfile && currentProfile.premium);
+  }
+
+  function requirePremium(){
+    if(isPremiumActive()) return true;
+    openSettingsPanel();
+    document.querySelector('.tab-btn[data-tab="premium"]').click();
+    return false;
+  }
+
+  /* ---- debounced cloud save of settings (premium users only) ---- */
+  function queueCloudSave(){
+    if(!isPremiumActive()) return;
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(function(){
+      var bgIsHuge = settings.bgType === 'data'; // skip syncing base64 uploads, keep cloud payload small
+      supabase.from('profiles').update({
+        settings: {
+          layout: settings.layout,
+          widgets: settings.widgets,
+          ai: settings.ai,
+          calendarEmbedUrl: settings.calendarEmbedUrl,
+          accent: settings.accent,
+          mode: settings.mode,
+          bgType: bgIsHuge ? 'none' : settings.bgType,
+          bgValue: bgIsHuge ? '' : settings.bgValue,
+          favorites: settings.favorites,
+          clockMode: settings.clockMode,
+          autoTZ: settings.autoTZ
+        },
+        updated_at: new Date().toISOString()
+      }).eq('id', currentUser.id).then(function(res){
+        if(res.error) console.error('Cloud save failed:', res.error);
+      });
+    }, 900);
+  }
+
+  /* ============ LAYOUT (clock / search placement + sizing) ============ */
+  function applyLayout(){
+    var L = settings.layout;
+
+    if(L.customEnabled){
+      clockEl.style.position = 'absolute';
+      clockEl.style.left = L.clock.x + '%';
+      clockEl.style.top = L.clock.y + '%';
+      clockEl.style.transform = 'translate(-50%,-50%) scale('+(L.clockScale||1)+')';
+
+      searchWrapEl.style.position = 'absolute';
+      searchWrapEl.style.left = L.search.x + '%';
+      searchWrapEl.style.top = L.search.y + '%';
+      searchWrapEl.style.transform = 'translate(-50%,-50%) scale('+(L.searchScale||1)+')';
+    } else {
+      clockEl.style.position = '';
+      clockEl.style.left = ''; clockEl.style.top = '';
+      clockEl.style.transform = 'scale('+(L.clockScale||1)+')';
+
+      searchWrapEl.style.position = '';
+      searchWrapEl.style.left = ''; searchWrapEl.style.top = '';
+      searchWrapEl.style.transform = 'scale('+(L.searchScale||1)+')';
+    }
+  }
+
+  /* generic drag helper — used for clock, search bar, and every widget panel */
+  function makeDraggable(el, handleEl, onDrag, opts){
+    opts = opts || {};
+    var dragging = false, startX, startY, startLeft, startTop;
+
+    handleEl.addEventListener('mousedown', startDrag);
+    handleEl.addEventListener('touchstart', startDrag, { passive:false });
+
+    function startDrag(e){
+      if(opts.enabledCheck && !opts.enabledCheck()) return;
+      dragging = true;
+      var pt = e.touches ? e.touches[0] : e;
+      startX = pt.clientX; startY = pt.clientY;
+      var rect = el.getBoundingClientRect();
+      startLeft = rect.left + rect.width/2;
+      startTop = rect.top + rect.height/2;
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('touchmove', drag, { passive:false });
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+      e.preventDefault();
+    }
+    function drag(e){
+      if(!dragging) return;
+      var pt = e.touches ? e.touches[0] : e;
+      var dx = pt.clientX - startX, dy = pt.clientY - startY;
+      var x = startLeft + dx, y = startTop + dy;
+      var xp = Math.max(4, Math.min(96, x / window.innerWidth * 100));
+      var yp = Math.max(4, Math.min(96, y / window.innerHeight * 100));
+      onDrag(xp, yp);
+      e.preventDefault();
+    }
+    function endDrag(){
+      if(!dragging) return;
+      dragging = false;
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+      saveSettings();
+    }
+  }
+
+  makeDraggable(clockEl, clockEl, function(x,y){
+    settings.layout.clock.x = x; settings.layout.clock.y = y;
+    clockEl.style.left = x+'%'; clockEl.style.top = y+'%';
+  }, { enabledCheck: function(){ return document.body.classList.contains('layout-edit') && settings.layout.customEnabled; } });
+
+  makeDraggable(searchWrapEl, searchWrapEl, function(x,y){
+    settings.layout.search.x = x; settings.layout.search.y = y;
+    searchWrapEl.style.left = x+'%'; searchWrapEl.style.top = y+'%';
+  }, { enabledCheck: function(){ return document.body.classList.contains('layout-edit') && settings.layout.customEnabled; } });
+
+  function updateDraggableVisuals(){
+    var on = document.body.classList.contains('layout-edit') && settings.layout.customEnabled;
+    clockEl.classList.toggle('draggable-el', on);
+    searchWrapEl.classList.toggle('draggable-el', on);
+  }
+
+  document.getElementById('custom-layout-switch').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    settings.layout.customEnabled = !settings.layout.customEnabled;
+    this.classList.toggle('on', settings.layout.customEnabled);
+    applyLayout(); saveSettings(); updateDraggableVisuals();
+  });
+  document.getElementById('clock-scale').addEventListener('input', function(){
+    if(!requirePremium()) return;
+    settings.layout.clockScale = parseFloat(this.value);
+    applyLayout(); saveSettings();
+  });
+  document.getElementById('search-scale').addEventListener('input', function(){
+    if(!requirePremium()) return;
+    settings.layout.searchScale = parseFloat(this.value);
+    applyLayout(); saveSettings();
+  });
+  document.getElementById('edit-layout-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    document.body.classList.toggle('layout-edit');
+    this.textContent = document.body.classList.contains('layout-edit') ? 'Exit drag-to-move mode' : 'Toggle drag-to-move mode';
+    updateDraggableVisuals();
+  });
+
+  /* ============ AUTH ============ */
+  function showAuthState(){
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('need-premium-section').style.display = 'none';
+    document.getElementById('account-hub').style.display = 'none';
+    document.getElementById('widget-dock').innerHTML = '';
+
+    var iconEl = document.getElementById('account-btn-icon');
+    var avatarEl = document.getElementById('account-btn-avatar');
+
+    if(!currentUser){
+      document.getElementById('auth-section').style.display = 'block';
+      iconEl.style.display = 'block';
+      avatarEl.style.display = 'none';
+      document.getElementById('account-btn').classList.remove('active');
+    } else if(!isPremiumActive()){
+      document.getElementById('need-premium-section').style.display = 'block';
+      iconEl.style.display = 'block';
+      avatarEl.style.display = 'none';
+    } else {
+      document.getElementById('account-hub').style.display = 'block';
+      document.getElementById('account-btn').classList.add('active');
+      populateProfileUI();
+      renderWidgetDock();
+      if(currentProfile.avatar_url){
+        avatarEl.src = currentProfile.avatar_url;
+        avatarEl.style.display = 'block';
+        iconEl.style.display = 'none';
+      }
+      loadFriendsAndRequests();
+      subscribeRealtime();
+    }
+  }
+
+  document.querySelectorAll('#auth-subtabs .subtab-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#auth-subtabs .subtab-btn').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      document.getElementById('signin-pane').style.display = b.dataset.auth === 'signin' ? 'flex' : 'none';
+      document.getElementById('signup-pane').style.display = b.dataset.auth === 'signup' ? 'flex' : 'none';
+    });
+  });
+
+  document.getElementById('signin-btn').addEventListener('click', function(){
+    if(!requireSupabase()) return;
+    var email = document.getElementById('signin-email').value.trim();
+    var pw = document.getElementById('signin-password').value;
+    var errEl = document.getElementById('signin-error');
+    errEl.style.color = '#e0555f';
+    errEl.textContent = '';
+    supabase.auth.signInWithPassword({ email:email, password:pw }).then(function(res){
+      if(res.error){ errEl.textContent = res.error.message; return; }
+      onAuthed(res.data.user);
+    });
+  });
+
+  document.getElementById('signup-btn').addEventListener('click', function(){
+    if(!requireSupabase()) return;
+    var email = document.getElementById('signup-email').value.trim();
+    var pw = document.getElementById('signup-password').value;
+    var errEl = document.getElementById('signup-error');
+    errEl.style.color = '#e0555f';
+    errEl.textContent = '';
+    if(pw.length < 6){ errEl.textContent = 'Password must be at least 6 characters.'; return; }
+    supabase.auth.signUp({ email:email, password:pw }).then(function(res){
+      if(res.error){ errEl.textContent = res.error.message; return; }
+      if(res.data.user && !res.data.session){
+        errEl.style.color = 'var(--text-dim)';
+        errEl.textContent = 'Check your email to confirm your account, then sign in.';
+        return;
+      }
+      onAuthed(res.data.user);
+    });
+  });
+
+  function onAuthed(user){
+    currentUser = user;
+    supabase.from('profiles').select('*').eq('id', user.id).single().then(function(res){
+      var profile = res.data;
+      if(!profile){
+        // the auto-create trigger may not have finished yet — retry briefly
+        setTimeout(function(){ onAuthed(user); }, 700);
+        return;
+      }
+      currentProfile = profile;
+
+      if(!profile.premium){
+        supabase.auth.signOut().then(function(){
+          currentUser = null;
+          currentProfile = null;
+          showAuthState();
+          document.getElementById('need-premium-section').style.display = 'block';
+          document.getElementById('auth-section').style.display = 'none';
+        });
+        return;
+      }
+
+      // premium confirmed — merge cloud settings into local settings
+      var cloud = profile.settings || {};
+      settings.layout = Object.assign({}, settings.layout, cloud.layout || {});
+      settings.widgets = Object.assign({}, settings.widgets, cloud.widgets || {});
+      settings.ai = Object.assign({}, settings.ai, cloud.ai || {});
+      if(cloud.calendarEmbedUrl !== undefined) settings.calendarEmbedUrl = cloud.calendarEmbedUrl;
+      if(cloud.accent) settings.accent = cloud.accent;
+      if(cloud.mode) settings.mode = cloud.mode;
+      if(cloud.bgType) settings.bgType = cloud.bgType;
+      if(cloud.bgValue !== undefined) settings.bgValue = cloud.bgValue;
+      if(cloud.favorites) settings.favorites = cloud.favorites;
+      if(cloud.clockMode) settings.clockMode = cloud.clockMode;
+      if(typeof cloud.autoTZ === 'boolean') settings.autoTZ = cloud.autoTZ;
+
+      saveSettingsRaw();
+      applyAll();
+      showAuthState();
+    });
+  }
+
+  document.getElementById('intro-upgrade-btn').addEventListener('click', function(){
     window.open('https://lookit.xo.je/premium', '_blank');
+  });
+  document.getElementById('need-premium-upgrade-btn').addEventListener('click', function(){
+    window.open('https://lookit.xo.je/premium', '_blank');
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', function(){
+    if(!supabase) return;
+    supabase.auth.signOut().then(function(){
+      currentUser = null;
+      currentProfile = null;
+      if(realtimeChannel){ supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
+      showAuthState();
+    });
+  });
+
+  /* ============ PROFILE (username / display name / bio / avatar / banner) ============ */
+  function populateProfileUI(){
+    document.getElementById('username-input').value = currentProfile.username || '';
+    document.getElementById('displayname-input').value = currentProfile.display_name || '';
+    document.getElementById('bio-input').value = currentProfile.bio || '';
+    document.getElementById('ai-name-input').value = settings.ai.name;
+    document.getElementById('ai-personality-input').value = settings.ai.personality;
+    document.getElementById('calendar-url-input').value = settings.calendarEmbedUrl || '';
+    document.getElementById('custom-layout-switch').classList.toggle('on', settings.layout.customEnabled);
+    document.getElementById('clock-scale').value = settings.layout.clockScale;
+    document.getElementById('search-scale').value = settings.layout.searchScale;
+    ['news','weather','ai','calendar','friends'].forEach(function(k){
+      document.getElementById('widget-'+k+'-switch').classList.toggle('on', !!settings.widgets[k].enabled);
+    });
+    var bp = document.getElementById('banner-preview');
+    bp.style.backgroundImage = currentProfile.banner_url ? 'url("'+currentProfile.banner_url+'")' : 'none';
+    var ap = document.getElementById('avatar-preview');
+    ap.style.backgroundImage = currentProfile.avatar_url ? 'url("'+currentProfile.avatar_url+'")' : 'none';
+    updateDraggableVisuals();
+  }
+
+  document.getElementById('save-profile-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    var username = document.getElementById('username-input').value.trim().toLowerCase();
+    var displayName = document.getElementById('displayname-input').value.trim();
+    var bio = document.getElementById('bio-input').value.trim();
+    var statusEl = document.getElementById('username-status');
+
+    if(!/^[a-z0-9_]{3,20}$/.test(username)){
+      statusEl.style.color = '#e0555f';
+      statusEl.textContent = 'Username must be 3-20 characters: letters, numbers, underscores.';
+      return;
+    }
+
+    supabase.from('profiles').update({
+      username: username, display_name: displayName, bio: bio, updated_at: new Date().toISOString()
+    }).eq('id', currentUser.id).then(function(res){
+      if(res.error){
+        statusEl.style.color = '#e0555f';
+        statusEl.textContent = /duplicate|unique/i.test(res.error.message) ? 'That username is taken.' : res.error.message;
+        return;
+      }
+      currentProfile.username = username;
+      currentProfile.display_name = displayName;
+      currentProfile.bio = bio;
+      statusEl.style.color = 'var(--text-dim)';
+      statusEl.textContent = 'Saved.';
+    });
+  });
+
+  function uploadImage(file, kind){
+    if(!requirePremium()) return;
+    var ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    var path = currentUser.id + '/' + kind + '-' + Date.now() + '.' + ext;
+    supabase.storage.from('avatars').upload(path, file, { upsert:true }).then(function(res){
+      if(res.error){ alert('Upload failed: ' + res.error.message); return; }
+      var pub = supabase.storage.from('avatars').getPublicUrl(path);
+      var url = pub.data.publicUrl;
+      var col = kind === 'avatar' ? 'avatar_url' : 'banner_url';
+      var update = {};
+      update[col] = url;
+      supabase.from('profiles').update(update).eq('id', currentUser.id).then(function(){
+        currentProfile[col] = url;
+        populateProfileUI();
+        if(kind === 'avatar'){
+          var img = document.getElementById('account-btn-avatar');
+          img.src = url; img.style.display = 'block';
+          document.getElementById('account-btn-icon').style.display = 'none';
+        }
+      });
+    });
+  }
+  document.getElementById('avatar-file-input').addEventListener('change', function(e){
+    if(e.target.files[0]) uploadImage(e.target.files[0], 'avatar');
+  });
+  document.getElementById('banner-file-input').addEventListener('change', function(e){
+    if(e.target.files[0]) uploadImage(e.target.files[0], 'banner');
+  });
+
+  /* ============ HUB SUB-TABS ============ */
+  document.querySelectorAll('#hub-subtabs .subtab-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#hub-subtabs .subtab-btn').forEach(function(x){ x.classList.remove('active'); });
+      document.querySelectorAll('[data-hubpane]').forEach(function(p){ p.classList.remove('active'); });
+      b.classList.add('active');
+      document.querySelector('[data-hubpane="'+b.dataset.hub+'"]').classList.add('active');
+    });
+  });
+
+  /* ============ WIDGETS: toggles + config ============ */
+  var WIDGET_META = {
+    news:     { icon:'📰', title:"Today's News" },
+    weather:  { icon:'🌤️', title:'Weather' },
+    ai:       { icon:'🤖', title:'AI Companion' },
+    calendar: { icon:'📅', title:'Calendar' },
+    friends:  { icon:'👥', title:'Friends' }
+  };
+
+  ['news','weather','ai','calendar','friends'].forEach(function(key){
+    document.getElementById('widget-'+key+'-switch').addEventListener('click', function(){
+      if(!requirePremium()) return;
+      settings.widgets[key].enabled = !settings.widgets[key].enabled;
+      this.classList.toggle('on', settings.widgets[key].enabled);
+      saveSettings();
+      renderWidgetDock();
+      if(!settings.widgets[key].enabled){
+        var p = document.getElementById('panel-'+key);
+        if(p) p.remove();
+      }
+    });
+  });
+
+  document.getElementById('save-ai-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    settings.ai.name = document.getElementById('ai-name-input').value.trim() || 'Nova';
+    settings.ai.personality = document.getElementById('ai-personality-input').value.trim() || defaults.ai.personality;
+    saveSettings();
+    renderAIWidgetHeader();
+  });
+
+  document.getElementById('save-calendar-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    settings.calendarEmbedUrl = document.getElementById('calendar-url-input').value.trim();
+    saveSettings();
+    var iframe = document.getElementById('calendar-iframe');
+    if(iframe) iframe.src = settings.calendarEmbedUrl;
+    else{
+      var body = document.getElementById('body-calendar');
+      if(body) loadCalendarWidget();
+    }
+  });
+
+  /* ---- widget dock + generic panel creation ---- */
+  function renderWidgetDock(){
+    var dock = document.getElementById('widget-dock');
+    dock.innerHTML = '';
+    if(!isPremiumActive()) return;
+    Object.keys(WIDGET_META).forEach(function(key){
+      if(!settings.widgets[key].enabled) return;
+      var btn = document.createElement('button');
+      btn.className = 'dock-btn';
+      btn.textContent = WIDGET_META[key].icon;
+      btn.title = WIDGET_META[key].title;
+      btn.addEventListener('click', function(){ toggleWidgetPanel(key); });
+      dock.appendChild(btn);
+    });
+  }
+
+  function toggleWidgetPanel(key){
+    var existing = document.getElementById('panel-'+key);
+    if(existing){ existing.remove(); return; }
+
+    var panel = document.createElement('div');
+    panel.className = 'widget-panel';
+    panel.id = 'panel-'+key;
+    var pos = settings.widgets[key];
+    panel.style.left = pos.x + '%';
+    panel.style.top = pos.y + '%';
+    panel.innerHTML =
+      '<div class="widget-head"><span class="wh-title">'+ WIDGET_META[key].icon +' '+ escapeHtml(WIDGET_META[key].title) +'</span>'+
+        '<div class="widget-close">'+
+        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'+
+        '</div></div>'+
+      '<div class="widget-body" id="body-'+key+'">Loading…</div>';
+    document.body.appendChild(panel);
+
+    panel.querySelector('.widget-close').addEventListener('click', function(){ panel.remove(); });
+
+    makeDraggable(panel, panel.querySelector('.widget-head'), function(x,y){
+      settings.widgets[key].x = x; settings.widgets[key].y = y;
+      panel.style.left = x+'%'; panel.style.top = y+'%';
+    }, { enabledCheck: function(){ return true; } });
+    // widget panels also save position on drag end via the generic makeDraggable's endDrag -> saveSettings()
+
+    loadWidgetContent(key);
+  }
+
+  function loadWidgetContent(key){
+    if(key === 'news') loadNewsWidget();
+    else if(key === 'weather') loadWeatherWidget();
+    else if(key === 'ai') loadAIWidget();
+    else if(key === 'calendar') loadCalendarWidget();
+    else if(key === 'friends') loadFriendsWidget();
+  }
+
+  /* ---- News widget: Tavily headlines + OpenRouter summary, cached per day ---- */
+  function loadNewsWidget(){
+    var body = document.getElementById('body-news');
+    var cacheKey = 'lookit_news_cache';
+    var today = new Date().toDateString();
+    try{
+      var cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+      if(cached && cached.date === today){ body.innerHTML = cached.html; return; }
+    }catch(e){}
+
+    if(!TAVILY_API_KEY || TAVILY_API_KEY.indexOf('YOUR_') === 0){
+      body.textContent = 'Add a Tavily API key to enable the news widget.';
+      return;
+    }
+    body.textContent = "Getting today's headlines…";
+
+    fetch('https://api.tavily.com/search', {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ api_key: TAVILY_API_KEY, query:'top world news today', search_depth:'basic', include_answer:false, max_results:6 })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var results = data.results || [];
+      if(!results.length) throw new Error('no results');
+
+      if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY.indexOf('YOUR_') === 0){
+        var html = results.slice(0,5).map(function(r){
+          return '<div style="margin-bottom:10px;"><a href="'+r.url+'" target="_blank" style="font-weight:600;color:var(--text);">'+escapeHtml(r.title)+'</a></div>';
+        }).join('');
+        body.innerHTML = html;
+        return;
+      }
+
+      var items = results.map(function(r){ return '- '+r.title+': '+ (r.content||'').slice(0,200); }).join('\n');
+
+      return fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+OPENROUTER_API_KEY },
+        body: JSON.stringify({
+          model: OPENROUTER_MODEL, temperature:0.4,
+          messages:[
+            { role:'system', content:'Summarize today\'s news into exactly 5 short bullet points, plain text, one per line, each starting with "• ". No preamble, no extra commentary.' },
+            { role:'user', content: items }
+          ]
+        })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        var text = res.choices && res.choices[0] && res.choices[0].message.content;
+        var html = '<div style="white-space:pre-line;line-height:1.6;">'+ escapeHtml(text || 'No summary available.') +'</div>';
+        body.innerHTML = html;
+        try{ localStorage.setItem(cacheKey, JSON.stringify({ date:today, html:html })); }catch(e){}
+      });
+    })
+    .catch(function(){ body.textContent = "Couldn't load news right now."; });
+  }
+
+  /* ---- Weather widget: Open-Meteo, no API key required ---- */
+  function loadWeatherWidget(){
+    var body = document.getElementById('body-weather');
+    body.textContent = 'Locating…';
+    if(!navigator.geolocation){ body.textContent = "Location isn't available in this browser."; return; }
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat = pos.coords.latitude, lon = pos.coords.longitude;
+      fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,weather_code&temperature_unit=fahrenheit')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          var c = data.current;
+          if(!c) throw new Error('no data');
+          var desc = weatherCodeToText(c.weather_code);
+          body.innerHTML = '<div style="text-align:center;padding:8px 0;">'+
+            '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:2.2rem;font-weight:700;">'+Math.round(c.temperature_2m)+'°F</div>'+
+            '<div style="color:var(--text-dim);margin-top:4px;">'+desc+'</div></div>';
+        })
+        .catch(function(){ body.textContent = "Couldn't load the weather."; });
+    }, function(){
+      body.textContent = 'Location access was denied — allow it to see local weather.';
+    });
+  }
+  function weatherCodeToText(code){
+    var map = { 0:'Clear sky',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Fog',51:'Light drizzle',
+      61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',95:'Thunderstorm' };
+    return map[code] || 'Unknown';
+  }
+
+  /* ---- AI Companion widget ---- */
+  function loadAIWidget(){
+    var body = document.getElementById('body-ai');
+    body.innerHTML =
+      '<div class="chat-thread" id="ai-thread"></div>'+
+      '<div class="chat-input-row"><input type="text" id="ai-chat-input" placeholder="Message '+escapeHtml(settings.ai.name)+'…">'+
+      '<button id="ai-chat-send">Send</button></div>';
+    renderAIThread();
+    document.getElementById('ai-chat-send').addEventListener('click', sendAIMessage);
+    document.getElementById('ai-chat-input').addEventListener('keydown', function(e){ if(e.key === 'Enter') sendAIMessage(); });
+    renderAIWidgetHeader();
+  }
+  function renderAIThread(){
+    var thread = document.getElementById('ai-thread');
+    if(!thread) return;
+    thread.innerHTML = aiHistory.map(function(m){
+      return '<div class="chat-bubble '+(m.role==='user'?'me':'them')+'">'+ escapeHtml(m.content) +'</div>';
+    }).join('') || '<div class="row-sub">Say hi to '+escapeHtml(settings.ai.name)+'.</div>';
+    thread.scrollTop = thread.scrollHeight;
+  }
+  function renderAIWidgetHeader(){
+    var panel = document.getElementById('panel-ai');
+    if(!panel) return;
+    panel.querySelector('.wh-title').textContent = WIDGET_META.ai.icon + ' ' + settings.ai.name;
+    var input = document.getElementById('ai-chat-input');
+    if(input) input.placeholder = 'Message ' + settings.ai.name + '…';
+  }
+  function sendAIMessage(){
+    var input = document.getElementById('ai-chat-input');
+    var text = input.value.trim();
+    if(!text) return;
+    input.value = '';
+    aiHistory.push({ role:'user', content:text });
+    renderAIThread();
+
+    if(!OPENROUTER_API_KEY || OPENROUTER_API_KEY.indexOf('YOUR_') === 0){
+      aiHistory.push({ role:'assistant', content:'(Add an OpenRouter API key in the code to enable '+settings.ai.name+'.)' });
+      renderAIThread();
+      return;
+    }
+
+    var sys = 'You are '+settings.ai.name+", a private AI companion living inside the user's browser new tab. "+
+      'Your personality: '+ settings.ai.personality + '. '+
+      'Always respond in character as '+settings.ai.name+' and keep replies conversational and fairly short. '+
+      'If asked your name, answer "'+settings.ai.name+'".';
+
+    var msgs = [{ role:'system', content:sys }].concat(aiHistory.slice(-10));
+
+    fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+OPENROUTER_API_KEY },
+      body: JSON.stringify({ model: OPENROUTER_MODEL, temperature:0.8, messages: msgs })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      var reply = res.choices && res.choices[0] && res.choices[0].message.content;
+      aiHistory.push({ role:'assistant', content: reply || '...' });
+      renderAIThread();
+    })
+    .catch(function(){
+      aiHistory.push({ role:'assistant', content:'Something went wrong reaching me just now.' });
+      renderAIThread();
+    });
+  }
+
+  /* ---- Calendar widget ---- */
+  function loadCalendarWidget(){
+    var body = document.getElementById('body-calendar');
+    if(!settings.calendarEmbedUrl){
+      body.innerHTML = '<div class="row-sub">Add your Google Calendar embed URL in Premium → Widgets to see it here.</div>';
+      return;
+    }
+    body.innerHTML = '<iframe id="calendar-iframe" src="'+settings.calendarEmbedUrl+'" style="width:100%;height:320px;border:0;border-radius:8px;" frameborder="0"></iframe>';
+  }
+
+  /* ---- Friends widget (list + chat) ---- */
+  function loadFriendsWidget(){
+    var body = document.getElementById('body-friends');
+    body.innerHTML =
+      '<div id="friends-widget-list" style="margin-bottom:10px;"></div>'+
+      '<div id="chat-area" style="display:none;">'+
+        '<div class="chat-thread" id="chat-thread"></div>'+
+        '<div class="chat-input-row"><input type="text" id="chat-input" placeholder="Message…"><button id="chat-send">Send</button></div>'+
+      '</div>';
+    loadFriendsAndRequests();
+  }
+
+  function openChatWith(friendId){
+    activeChatFriend = friendId;
+    var area = document.getElementById('chat-area');
+    if(area) area.style.display = 'block';
+    supabase.from('messages').select('*')
+      .or('and(sender_id.eq.'+currentUser.id+',receiver_id.eq.'+friendId+'),and(sender_id.eq.'+friendId+',receiver_id.eq.'+currentUser.id+')')
+      .order('created_at', { ascending:true })
+      .then(function(res){ renderChatThread(res.data || []); });
+    var sendBtn = document.getElementById('chat-send');
+    var input = document.getElementById('chat-input');
+    if(sendBtn) sendBtn.onclick = sendChatMessage;
+    if(input) input.onkeydown = function(e){ if(e.key === 'Enter') sendChatMessage(); };
+  }
+  function renderChatThread(messages){
+    var thread = document.getElementById('chat-thread');
+    if(!thread) return;
+    thread.innerHTML = messages.map(function(m){
+      return '<div class="chat-bubble '+(m.sender_id===currentUser.id?'me':'them')+'">'+ escapeHtml(m.content) +'</div>';
+    }).join('');
+    thread.scrollTop = thread.scrollHeight;
+  }
+  function sendChatMessage(){
+    var input = document.getElementById('chat-input');
+    var text = input.value.trim();
+    if(!text || !activeChatFriend) return;
+    input.value = '';
+    supabase.from('messages').insert({ sender_id: currentUser.id, receiver_id: activeChatFriend, content:text }).then(function(res){
+      if(!res.error) openChatWith(activeChatFriend);
+    });
+  }
+
+  /* ============ FRIENDS TAB: search, requests, list ============ */
+  function loadFriendsAndRequests(){
+    if(!supabase || !currentUser) return;
+
+    supabase.from('friend_requests')
+      .select('*, sender:sender_id(username,display_name,avatar_url)')
+      .eq('receiver_id', currentUser.id)
+      .eq('status', 'pending')
+      .then(function(res){ renderFriendRequests(res.data || []); });
+
+    supabase.from('friendships')
+      .select('*, friend:friend_id(id,username,display_name,avatar_url)')
+      .eq('user_id', currentUser.id)
+      .then(function(res){ renderFriendsList(res.data || []); });
+  }
+
+  function renderFriendRequests(list){
+    var el = document.getElementById('friend-requests-list');
+    if(!el) return;
+    if(!list.length){ el.innerHTML = '<div class="row-sub">No pending requests</div>'; return; }
+    el.innerHTML = list.map(function(r){
+      var s = r.sender || {};
+      return '<div class="friend-row" style="cursor:default;">'+
+        '<img src="'+(s.avatar_url||'')+'" onerror="this.style.display=\'none\'">'+
+        '<div class="fr-name">'+ escapeHtml(s.display_name || s.username || 'Someone') +'</div>'+
+        '<div class="fr-actions">'+
+          '<button class="fr-btn accept" data-id="'+r.id+'" data-action="accept">Accept</button>'+
+          '<button class="fr-btn" data-id="'+r.id+'" data-action="decline">Decline</button>'+
+        '</div></div>';
+    }).join('');
+    el.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.dataset.id;
+        if(btn.dataset.action === 'accept') acceptRequest(id);
+        else declineRequest(id);
+      });
+    });
+  }
+
+  function renderFriendsList(list){
+    var el = document.getElementById('friends-list');
+    var widgetEl = document.getElementById('friends-widget-list');
+    var html = !list.length ? '<div class="row-sub">No friends yet</div>' : list.map(function(f){
+      var fr = f.friend || {};
+      return '<div class="friend-row" data-friend-id="'+fr.id+'">'+
+        '<img src="'+(fr.avatar_url||'')+'" onerror="this.style.display=\'none\'">'+
+        '<div class="fr-name">'+ escapeHtml(fr.display_name || fr.username || 'Friend') +'</div>'+
+        '</div>';
+    }).join('');
+    if(el) el.innerHTML = html;
+    if(widgetEl){
+      widgetEl.innerHTML = html;
+      widgetEl.querySelectorAll('.friend-row').forEach(function(row){
+        row.addEventListener('click', function(){ openChatWith(row.dataset.friendId); });
+      });
+    }
+  }
+
+  document.getElementById('friend-search-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    var q = document.getElementById('friend-search-input').value.trim().toLowerCase();
+    var resultsEl = document.getElementById('friend-search-results');
+    if(!q) return;
+    supabase.from('profiles').select('id,username,display_name,avatar_url').ilike('username', '%'+q+'%').limit(6).then(function(res){
+      var list = (res.data || []).filter(function(p){ return p.id !== currentUser.id; });
+      if(!list.length){ resultsEl.innerHTML = '<div class="row-sub">No users found</div>'; return; }
+      resultsEl.innerHTML = list.map(function(p){
+        return '<div class="friend-row" style="cursor:default;"><img src="'+(p.avatar_url||'')+'" onerror="this.style.display=\'none\'">'+
+          '<div class="fr-name">'+ escapeHtml(p.display_name || p.username) +'</div>'+
+          '<button class="fr-btn" data-id="'+p.id+'">Add</button></div>';
+      }).join('');
+      resultsEl.querySelectorAll('.fr-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          supabase.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: btn.dataset.id }).then(function(res){
+            btn.textContent = res.error ? 'Failed' : 'Sent';
+            btn.disabled = true;
+          });
+        });
+      });
+    });
+  });
+
+  function acceptRequest(id){
+    supabase.from('friend_requests').update({ status:'accepted' }).eq('id', id).select().single().then(function(res){
+      if(res.error || !res.data) return;
+      var req = res.data;
+      supabase.from('friendships').insert([
+        { user_id: req.sender_id, friend_id: req.receiver_id },
+        { user_id: req.receiver_id, friend_id: req.sender_id }
+      ]).then(function(){ loadFriendsAndRequests(); });
+    });
+  }
+  function declineRequest(id){
+    supabase.from('friend_requests').update({ status:'declined' }).eq('id', id).then(function(){ loadFriendsAndRequests(); });
+  }
+
+  /* ---- realtime updates for chat + friend requests ---- */
+  function subscribeRealtime(){
+    if(!supabase || realtimeChannel || !currentUser) return;
+    realtimeChannel = supabase.channel('lookit-realtime-'+currentUser.id)
+      .on('postgres_changes', { event:'*', schema:'public', table:'messages' }, function(payload){
+        var row = payload.new || payload.old;
+        if(!row) return;
+        if(row.receiver_id !== currentUser.id && row.sender_id !== currentUser.id) return;
+        if(activeChatFriend && (row.sender_id === activeChatFriend || row.receiver_id === activeChatFriend)){
+          openChatWith(activeChatFriend);
+        }
+      })
+      .on('postgres_changes', { event:'*', schema:'public', table:'friend_requests' }, function(){
+        loadFriendsAndRequests();
+      })
+      .subscribe();
+  }
+
+  /* ============ EXPORT / IMPORT ============ */
+  document.getElementById('export-btn').addEventListener('click', function(){
+    if(!requirePremium()) return;
+    var payload = {
+      settings: settings,
+      profile: { username: currentProfile.username, display_name: currentProfile.display_name, bio: currentProfile.bio }
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lookit-data-export.json';
+    a.click();
+  });
+
+  document.getElementById('import-file-input').addEventListener('change', function(e){
+    if(!requirePremium()) return;
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var data = JSON.parse(ev.target.result);
+        if(data.settings) Object.assign(settings, data.settings);
+        settings.layout = Object.assign({}, defaults.layout, settings.layout);
+        settings.widgets = Object.assign({}, defaults.widgets, settings.widgets);
+        settings.ai = Object.assign({}, defaults.ai, settings.ai);
+        saveSettings();
+        applyAll();
+        alert('Import complete.');
+      }catch(err){
+        alert('That file could not be read as LookIt data.');
+      }
+    };
+    reader.readAsText(file);
   });
 
   /* ============ APPLY EVERYTHING ON LOAD ============ */
@@ -1424,9 +2551,33 @@
     // favorites
     if(!Array.isArray(settings.favorites)) settings.favorites = [];
     renderFavorites();
+
+    // premium layout
+    applyLayout();
+
+    // widget dock (only shows anything if premium is active)
+    renderWidgetDock();
   }
 
   applyAll();
+
+  /* ============ SESSION BOOTSTRAP ============ */
+  if(supabase){
+    supabase.auth.getSession().then(function(res){
+      var session = res.data && res.data.session;
+      if(session && session.user) onAuthed(session.user);
+      else showAuthState();
+    });
+    supabase.auth.onAuthStateChange(function(event){
+      if(event === 'SIGNED_OUT'){
+        currentUser = null; currentProfile = null;
+        if(realtimeChannel){ supabase.removeChannel(realtimeChannel); realtimeChannel = null; }
+        showAuthState();
+      }
+    });
+  } else {
+    showAuthState();
+  }
 
 })();
 </script>
