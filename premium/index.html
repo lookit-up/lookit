@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LookIt Premium – Support the tab you use every day.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0a06;
+    --surface:#151209;
+    --surface-2:#1c1810;
+    --line:rgba(255,212,0,0.12);
+    --yellow:#ffd400;
+    --yellow-dim:#c9a600;
+    --amber:#ff9900;
+    --text:#f5f2e6;
+    --text-dim:#a39c86;
+    --text-faint:#6b6555;
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,212,0,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,153,0,0.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--yellow); color:#141105; }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.04em; }
+
+  /* -------- NAV -------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(14px);
+    background:rgba(11,10,6,0.72);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:76px;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:1.25rem; letter-spacing:-0.01em;
+  }
+  .logo .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg, var(--yellow), var(--amber));
+    display:grid; place-items:center;
+    color:#141105; font-weight:700; font-size:0.95rem;
+    box-shadow:0 0 24px rgba(255,212,0,0.35);
+  }
+  .nav-links{ display:flex; align-items:center; gap:34px; }
+  .nav-links a{
+    font-size:0.92rem; color:var(--text-dim); font-weight:500;
+    transition:color .2s ease;
+  }
+  .nav-links a:hover{ color:var(--yellow); }
+  .nav-cta{
+    padding:10px 20px; border-radius:999px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.88rem;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .nav-cta:hover{ transform:translateY(-1px); box-shadow:0 6px 24px rgba(255,212,0,0.35); }
+
+  /* -------- HERO -------- */
+  .hero{
+    position:relative;
+    padding:110px 0 90px;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .beam{
+    position:absolute; top:0; left:-20%;
+    width:55%; height:180%;
+    background:linear-gradient(100deg, transparent, rgba(255,212,0,0.10) 40%, rgba(255,212,0,0.02) 60%, transparent);
+    transform:rotate(8deg);
+    animation:sweep 9s ease-in-out infinite;
+    z-index:-1;
+    pointer-events:none;
+  }
+  @keyframes sweep{
+    0%,100%{ transform:translateX(0) rotate(8deg); opacity:0.6; }
+    50%{ transform:translateX(65vw) rotate(8deg); opacity:1; }
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 14px; border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-size:0.8rem; color:var(--yellow);
+    font-weight:500;
+    margin-bottom:28px;
+  }
+  .badge .dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--yellow);
+    box-shadow:0 0 8px var(--yellow);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+  .hero h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(2.4rem, 5.6vw, 4.6rem);
+    line-height:1.03;
+    letter-spacing:-0.03em;
+    max-width:820px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(100deg, var(--yellow), var(--amber) 70%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .hero p.lead{
+    margin-top:26px;
+    max-width:560px;
+    font-size:1.08rem;
+    line-height:1.65;
+    color:var(--text-dim);
+  }
+  .hero-actions{
+    margin-top:38px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .btn-primary{
+    padding:14px 26px; border-radius:10px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.95rem;
+    display:inline-flex; align-items:center; gap:8px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,212,0,0.3); }
+  .btn-ghost{
+    padding:14px 26px; border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    font-weight:600; font-size:0.95rem; color:var(--text);
+    transition:border-color .18s ease, background .18s ease;
+  }
+  .btn-ghost:hover{ border-color:rgba(255,212,0,0.4); background:var(--surface-2); }
+
+  /* -------- SECTION HEADS -------- */
+  .section{ padding:100px 0; }
+  .section.alt{ background:linear-gradient(180deg, transparent, rgba(255,212,0,0.02), transparent); }
+  .eyebrow{
+    font-size:0.82rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--yellow-dim);
+    margin-bottom:14px;
+  }
+  .section h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight:700; letter-spacing:-0.02em;
+    max-width:560px;
+  }
+  .section p.sub{
+    margin-top:16px; max-width:560px;
+    color:var(--text-dim); line-height:1.65; font-size:1rem;
+  }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:24px; margin-bottom:52px;
+  }
+
+  /* -------- BENEFITS GRID -------- */
+  .grid-3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    transition:transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(255,212,0,0.35);
+    background:var(--surface-2);
+  }
+  .card .icon{
+    width:42px; height:42px; border-radius:10px;
+    background:rgba(255,212,0,0.1);
+    display:grid; place-items:center;
+    color:var(--yellow); margin-bottom:20px;
+  }
+  .card h3{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.08rem; font-weight:600; margin-bottom:10px;
+  }
+  .card p{
+    font-size:0.92rem; line-height:1.6; color:var(--text-dim);
+  }
+
+  /* -------- PLAN CARDS (premium types) -------- */
+  .plans{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; align-items:stretch; }
+  .plan{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    display:flex; flex-direction:column;
+    transition:transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .plan:hover{ transform:translateY(-4px); border-color:rgba(255,212,0,0.35); }
+  .plan.featured{
+    border-color:rgba(255,212,0,0.5);
+    background:linear-gradient(180deg, rgba(255,212,0,0.06), var(--surface) 40%);
+    box-shadow:0 20px 50px rgba(255,212,0,0.08);
+  }
+  .plan .ribbon{
+    position:absolute; top:-1px; right:24px;
+    background:var(--yellow); color:#141105;
+    font-size:0.7rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase;
+    padding:6px 12px; border-radius:0 0 8px 8px;
+  }
+  .plan .plan-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.05rem; font-weight:600; color:var(--yellow-dim);
+    text-transform:uppercase; letter-spacing:0.04em; font-size:0.78rem;
+  }
+  .plan .plan-price{
+    margin-top:14px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:2.4rem; font-weight:700; letter-spacing:-0.02em;
+  }
+  .plan .plan-price span{
+    font-size:0.95rem; font-weight:500; color:var(--text-faint); font-family:'Inter',sans-serif;
+  }
+  .plan .plan-desc{
+    margin-top:10px; font-size:0.88rem; color:var(--text-dim); line-height:1.55;
+    min-height:44px;
+  }
+  .plan ul{ list-style:none; margin-top:24px; flex:1; display:flex; flex-direction:column; gap:12px; }
+  .plan li{
+    font-size:0.87rem; color:var(--text); display:flex; align-items:flex-start; gap:10px; line-height:1.4;
+  }
+  .plan li svg{ flex-shrink:0; margin-top:2px; color:var(--yellow); }
+  .plan .plan-btn{
+    margin-top:28px; text-align:center; padding:12px 20px; border-radius:10px;
+    font-weight:600; font-size:0.9rem;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--text);
+    transition:border-color .18s ease, background .18s ease, color .18s ease;
+  }
+  .plan.featured .plan-btn{
+    background:var(--yellow); color:#141105; border-color:transparent;
+  }
+  .plan .plan-btn:hover{ border-color:rgba(255,212,0,0.4); }
+  .plan.featured .plan-btn:hover{ box-shadow:0 8px 24px rgba(255,212,0,0.3); }
+
+  /* -------- PAYMENT METHODS -------- */
+  .pay-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  .pay-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    display:flex; flex-direction:column; gap:16px;
+    transition:transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .pay-card:hover{ transform:translateY(-4px); border-color:rgba(255,212,0,0.35); background:var(--surface-2); }
+  .pay-card .pay-icon{
+    width:44px; height:44px; border-radius:10px;
+    background:rgba(255,212,0,0.1); color:var(--yellow);
+    display:grid; place-items:center;
+  }
+  .pay-card h3{ font-family:'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:600; }
+  .pay-card p{ font-size:0.88rem; color:var(--text-dim); line-height:1.6; }
+  .pay-card .pay-tag{
+    margin-top:auto;
+    font-family:'JetBrains Mono', monospace; font-size:0.72rem;
+    color:var(--yellow-dim);
+  }
+
+  /* -------- MONEY BREAKDOWN -------- */
+  .breakdown{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:36px;
+  }
+  .bd-row{
+    display:grid; grid-template-columns:200px 1fr 60px;
+    align-items:center; gap:20px;
+    padding:16px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .bd-row:last-child{ border-bottom:none; }
+  .bd-label{ font-weight:600; font-size:0.92rem; }
+  .bd-label .bd-sub{ display:block; font-weight:400; font-size:0.8rem; color:var(--text-faint); margin-top:3px; }
+  .bd-bar{
+    height:10px; border-radius:999px; background:var(--surface-2);
+    overflow:hidden; position:relative;
+  }
+  .bd-fill{
+    height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--yellow), var(--amber));
+  }
+  .bd-pct{ font-family:'JetBrains Mono', monospace; font-size:0.88rem; color:var(--yellow); text-align:right; }
+
+  /* -------- CTA BAND -------- */
+  .cta-band{
+    margin:0 28px;
+    max-width:1124px; margin-inline:auto;
+    border-radius:24px;
+    padding:64px 48px;
+    text-align:center;
+    background:
+      radial-gradient(ellipse 500px 260px at 50% 0%, rgba(255,212,0,0.16), transparent 70%),
+      var(--surface);
+    border:1px solid var(--line);
+  }
+  .cta-band h2{ margin:0 auto 16px; }
+  .cta-band p.sub{ margin-inline:auto; }
+  .cta-band .hero-actions{ justify-content:center; margin-top:32px; }
+
+  /* -------- FOOTER -------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:56px 0 32px;
+  }
+  .footer-grid{
+    display:grid; grid-template-columns:1.4fr repeat(3, 1fr);
+    gap:40px;
+    padding-bottom:40px;
+  }
+  .footer-col h5{
+    font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-faint); margin-bottom:16px;
+  }
+  .footer-col a{
+    display:block; font-size:0.9rem; color:var(--text-dim);
+    margin-bottom:12px; transition:color .15s ease;
+  }
+  .footer-col a:hover{ color:var(--yellow); }
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:28px; border-top:1px solid var(--line);
+    font-size:0.82rem; color:var(--text-faint);
+    flex-wrap:wrap; gap:12px;
+  }
+
+  @media (max-width:860px){
+    .nav-links{ display:none; }
+    .grid-3, .plans, .pay-grid{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+    .cta-band{ padding:48px 26px; }
+    .bd-row{ grid-template-columns:1fr; gap:8px; }
+    .bd-pct{ text-align:left; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .beam{ animation:none; }
+    .badge .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="mark">⌕</span>LookIt</div>
+    <div class="nav-links">
+      <a href="#benefits">Benefits</a>
+      <a href="#plans">Plans</a>
+      <a href="#pay">Payment</a>
+      <a href="#money">Where it goes</a>
+    </div>
+    <a href="https://lookit.xo.je/search" class="nav-cta">Back to LookIt</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="beam"></div>
+  <div class="wrap">
+    <div class="badge"><span class="dot"></span> LookIt Premium</div>
+    <h1>Keep LookIt <span class="accent">free for everyone</span> — and get a little extra for yourself.</h1>
+    <p class="lead">LookIt will always work without paying a cent. Premium exists for the people who want to help cover the bill and pick up a few extras along the way — better customization, accounts, and first access to new tools.</p>
+    <div class="hero-actions">
+      <a href="#plans" class="btn-primary">
+        See Premium plans
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#money" class="btn-ghost">See where the money goes</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="benefits">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Premium Benefits</div>
+        <h2>What you actually get</h2>
+        <p class="sub">Nothing about search gets locked behind a paywall. Premium is entirely extra — quality of life, not gatekeeping.</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>More Customization</h3>
+        <p>Unlock ai news summaries, widgets, and much more.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3v6M12 15v6M3 12h6M15 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Account Syncing</h3>
+        <p>You can create an account and sync your info to it with LookIt Premium.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>Early Access</h3>
+        <p>You get access to our projects and major site updates when they come out for early release.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M9 12h6M12 9v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Extra Widgets</h3>
+        <p>Add weather, notes, a calendar, a personal ai, and mail summaries to your new tab.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Priority Support</h3>
+        <p>Jump the queue when you need help — most Premium replies land within a few hours.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2H6a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3>Badge & Recognition</h3>
+        <p>A small mark next to your name in our Discord and our changelog comments — just a thank-you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="plans">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Premium Types</div>
+        <h2>Pick the level that fits</h2>
+        <p class="sub">Three tiers, all optional.</p>
+      </div>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">Supporter</div>
+        <div class="plan-price">$6<span>/month</span></div>
+        <p class="plan-desc">For anyone who just wants to say thanks and grab the basics.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Account Syncing</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Early Access</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Supporter badge</li>
+        </ul>
+        <a href="https://lookit.xo.je/premium/supporter" class="plan-btn">Choose Supporter</a>
+      </div>
+
+      <div class="plan featured">
+        <div class="ribbon">Most picked</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$12<span>/month</span></div>
+        <p class="plan-desc">Everything unlocked, synced everywhere, and first in line for new tools.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>All theme unlocks</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited device sync</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Early access tools</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>All extra widgets</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support</li>
+        </ul>
+        <a href="https://lookit.xo.je/premium/pro" class="plan-btn">Choose Pro</a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">Lifetime</div>
+        <div class="plan-price">$30<span>once</span></div>
+        <p class="plan-desc">Pay once, keep every Pro benefit for as long as LookIt exists, including the unlisted benefits, and you get permanet premium on all of our projects.</p>
+        <ul>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Pro, forever, and then some.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>No renewals, ever</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime badge + name in credits</li>
+        </ul>
+        <a href="https://lookit.xo.je/premium/lifetime" class="plan-btn">Choose Lifetime</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pay">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">3 Ways To Pay</div>
+        <h2>Pay however's easiest</h2>
+        <p class="sub">No account walls, no hidden fees. Pick the method you already trust.</p>
+      </div>
+    </div>
+    <div class="pay-grid">
+      <div class="pay-card">
+        <div class="pay-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        <h3>CashApp</h3>
+        <p>Pay via. CashApp for any of the plans above, or inquire for a custom plan. No refunds.</p>
+        <div class="pay-tag">Instant activation</div>
+      </div>
+      <div class="pay-card">
+        <div class="pay-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 15c0-4 3-8 8-8 4 0 5 2 5 4s-2 3-4 3H9c-2 0-3 1-3 3s1 3 3 3c3 0 5-2 6-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>PayPal</h3>
+        <p>You can also pay with PayPal, no custom plans available. No refunds.</p>
+        <div class="pay-tag">Instant activation</div>
+      </div>
+      <div class="pay-card">
+        <div class="pay-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5-3 1-3 2.5 1.3 2.5 3 2.5 3-1.1 3-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>Gift Cards</h3>
+        <p>Paying with a gift card is an accepted payment option, we take <a href="https://vanillagift.com">Visa</a> & <a href="">Google Play</a>, minimum of 25$ gift card, credit will be applied to your account and applied for monthly subscriptions until it runs out or you pause it. No refunds.</p>
+        <div class="pay-tag">Instant activation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="money">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Transparency</div>
+        <h2>What we do with that money</h2>
+        <p class="sub">We pay for LookIt out of pocket already — Premium money just keeps the lights on and gets funneled straight back into the tab itself. Here's roughly where it goes.</p>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="bd-row">
+        <div class="bd-label">Servers & hosting<span class="bd-sub">Search infra, sync, and uptime for 3,000+ tools</span></div>
+        <div class="bd-bar"><div class="bd-fill" style="width:38%"></div></div>
+        <div class="bd-pct">38%</div>
+      </div>
+      <div class="bd-row">
+        <div class="bd-label">Development<span class="bd-sub">Building new tools, themes, and widgets</span></div>
+        <div class="bd-bar"><div class="bd-fill" style="width:27%"></div></div>
+        <div class="bd-pct">27%</div>
+      </div>
+      <div class="bd-row">
+        <div class="bd-label">Domain & security<span class="bd-sub">Certificates, DNS, and keeping your data local</span></div>
+        <div class="bd-bar"><div class="bd-fill" style="width:12%"></div></div>
+        <div class="bd-pct">12%</div>
+      </div>
+      <div class="bd-row">
+        <div class="bd-label">Support<span class="bd-sub">Actual humans answering your tickets</span></div>
+        <div class="bd-bar"><div class="bd-fill" style="width:11%"></div></div>
+        <div class="bd-pct">11%</div>
+      </div>
+      <div class="bd-row">
+        <div class="bd-label">Kept free for everyone<span class="bd-sub">Subsidizes the free tier so it never needs ads</span></div>
+        <div class="bd-bar"><div class="bd-fill" style="width:12%"></div></div>
+        <div class="bd-pct">12%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="cta-band">
+      <div class="eyebrow" style="justify-content:center; display:flex;">ready when you are</div>
+      <h2>Go Premium today</h2>
+      <p class="sub">Free LookIt isn't going anywhere. Premium just makes it a little nicer, and keeps us running.</p>
+      <div class="hero-actions">
+        <a href="https://lookit.xo.je/premium" class="btn-primary">
+          Buy LookIt Premium
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="https://lookit.xo.je/search" class="btn-ghost">Keep using it free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="faq">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo"><span class="mark">⌕</span>LookIt</div>
+        <p style="margin-top:16px; font-size:0.88rem; color:var(--text-dim); line-height:1.6; max-width:260px;">
+          The free, ad-less, seamless, unlimited search tool.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h5>Info</h5>
+        <a href="https://lookit-up.github.io/lookit-up">About Me</a>
+        <a href="https://lookit-up.github.io/my-projects">My Projects</a>
+        <a href="https://lookit-up.github.io/socials">My Socials</a>
+      </div>
+      <div class="footer-col">
+        <h5>Site Map</h5>
+        <a href="https://lookit.xo.je/">About LookIt</a>
+        <a href="https://lookit.xo.je/search">LookIt Search</a>
+        <a href="https://lookit.xo.je/">Credits</a>
+      </div>
+      <div class="footer-col">
+        <h5>Tools</h5>
+        <a href="https://lookit.xo.je/tools">Tools Used</a>
+        <a href="https://lookit.xo.je/promos">Promos</a>
+        <a href="https://lookit.xo.je/partners">Partners</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="mono">© 2026 LookIt — your favorite new tab</div>
+      <div class="mono"><a href="https://github.com/lookit-up/lookit">GitHub</a> / <a href="https://lookit-up.github.io/lookit">Backup</a> / <a href="https://lookit-up.github.io/lookit-up">About Me</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
