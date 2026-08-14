@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LookIt Premium – Lifetime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0a06;
+    --surface:#151209;
+    --surface-2:#1c1810;
+    --line:rgba(255,212,0,0.12);
+    --yellow:#ffd400;
+    --yellow-dim:#c9a600;
+    --amber:#ff9900;
+    --text:#f5f2e6;
+    --text-dim:#a39c86;
+    --text-faint:#6b6555;
+    --radius:14px;
+    --plan-accent:#ffd400;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,212,0,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,153,0,0.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--yellow); color:#141105; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.04em; }
+
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(14px);
+    background:rgba(11,10,6,0.72);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{ display:flex; align-items:center; justify-content:space-between; height:76px; }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:1.25rem; letter-spacing:-0.01em;
+  }
+  .logo .mark{
+    width:30px; height:30px; border-radius:8px;
+    background:linear-gradient(135deg, var(--yellow), var(--amber));
+    display:grid; place-items:center;
+    color:#141105; font-weight:700; font-size:0.95rem;
+    box-shadow:0 0 24px rgba(255,212,0,0.35);
+  }
+  .nav-links{ display:flex; align-items:center; gap:34px; }
+  .nav-links a{ font-size:0.92rem; color:var(--text-dim); font-weight:500; transition:color .2s ease; }
+  .nav-links a:hover{ color:var(--yellow); }
+  .nav-cta{
+    padding:10px 20px; border-radius:999px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.88rem;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .nav-cta:hover{ transform:translateY(-1px); box-shadow:0 6px 24px rgba(255,212,0,0.35); }
+
+  .hero{ position:relative; padding:100px 0 70px; overflow:hidden; isolation:isolate; }
+  .beam{
+    position:absolute; top:0; left:-20%; width:55%; height:180%;
+    background:linear-gradient(100deg, transparent, rgba(255,212,0,0.10) 40%, rgba(255,212,0,0.02) 60%, transparent);
+    transform:rotate(8deg); animation:sweep 9s ease-in-out infinite; z-index:-1; pointer-events:none;
+  }
+  @keyframes sweep{
+    0%,100%{ transform:translateX(0) rotate(8deg); opacity:0.6; }
+    50%{ transform:translateX(65vw) rotate(8deg); opacity:1; }
+  }
+  .badge{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 14px; border-radius:999px;
+    border:1px solid var(--line); background:var(--surface);
+    font-size:0.8rem; color:var(--yellow); font-weight:500; margin-bottom:24px;
+  }
+  .badge .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--yellow);
+    box-shadow:0 0 8px var(--yellow); animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+  .hero h1{
+    font-family:'Space Grotesk', sans-serif; font-weight:700;
+    font-size:clamp(2.2rem, 5vw, 3.8rem); line-height:1.05; letter-spacing:-0.03em; max-width:760px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(100deg, var(--yellow), var(--amber) 70%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p.lead{ margin-top:22px; max-width:540px; font-size:1.05rem; line-height:1.65; color:var(--text-dim); }
+
+  .section{ padding:0 0 100px; }
+
+  .plan-layout{
+    display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;
+  }
+
+  .price-card{
+    background:linear-gradient(180deg, rgba(255,212,0,0.06), var(--surface) 45%);
+    border:1px solid rgba(255,212,0,0.35);
+    border-radius:var(--radius);
+    padding:36px;
+    box-shadow:0 20px 50px rgba(255,212,0,0.08);
+  }
+  .price-card .plan-name{
+    font-family:'Space Grotesk', sans-serif; font-size:0.8rem; font-weight:600;
+    color:var(--yellow-dim); text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .price-card .plan-price{
+    margin-top:14px; font-family:'Space Grotesk', sans-serif;
+    font-size:3rem; font-weight:700; letter-spacing:-0.02em;
+  }
+  .price-card .plan-price span{
+    font-size:1rem; font-weight:500; color:var(--text-faint); font-family:'Inter',sans-serif;
+  }
+  .price-card .plan-desc{ margin-top:12px; font-size:0.94rem; color:var(--text-dim); line-height:1.6; }
+
+  .discord-box{
+    margin-top:30px; padding:20px; border-radius:12px;
+    background:var(--surface-2); border:1px solid var(--line);
+    display:flex; align-items:flex-start; gap:14px;
+  }
+  .discord-box svg{ flex-shrink:0; color:var(--yellow); margin-top:2px; }
+  .discord-box p{ font-size:0.86rem; color:var(--text-dim); line-height:1.55; }
+  .discord-box p strong{ color:var(--text); font-weight:600; }
+
+  .join-btn{
+    margin-top:24px; width:100%;
+    padding:15px 26px; border-radius:10px;
+    background:var(--yellow); color:#141105;
+    font-weight:600; font-size:0.98rem;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .join-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,212,0,0.3); }
+  .join-btn svg{ width:20px; height:20px; }
+
+  .features-card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:36px;
+  }
+  .features-card h3{
+    font-family:'Space Grotesk', sans-serif; font-size:1.1rem; font-weight:600; margin-bottom:22px;
+  }
+  .features-card ul{ list-style:none; display:flex; flex-direction:column; gap:16px; }
+  .features-card li{
+    font-size:0.94rem; color:var(--text); display:flex; align-items:flex-start; gap:12px; line-height:1.5;
+  }
+  .features-card li svg{ flex-shrink:0; margin-top:3px; color:var(--yellow); }
+
+  .other-plans{ margin-top:28px; }
+  .other-plans p{ font-size:0.85rem; color:var(--text-faint); margin-bottom:12px; }
+  .other-plans .links{ display:flex; gap:14px; flex-wrap:wrap; }
+  .other-plans a{
+    font-size:0.86rem; font-weight:600; color:var(--yellow-dim);
+    padding:9px 16px; border-radius:999px; border:1px solid var(--line);
+    background:var(--surface); transition:border-color .18s ease, color .18s ease;
+  }
+  .other-plans a:hover{ border-color:rgba(255,212,0,0.4); color:var(--yellow); }
+
+  footer{ border-top:1px solid var(--line); padding:56px 0 32px; }
+  .footer-grid{ display:grid; grid-template-columns:1.4fr repeat(3, 1fr); gap:40px; padding-bottom:40px; }
+  .footer-col h5{
+    font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--text-faint); margin-bottom:16px;
+  }
+  .footer-col a{ display:block; font-size:0.9rem; color:var(--text-dim); margin-bottom:12px; transition:color .15s ease; }
+  .footer-col a:hover{ color:var(--yellow); }
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:28px; border-top:1px solid var(--line);
+    font-size:0.82rem; color:var(--text-faint); flex-wrap:wrap; gap:12px;
+  }
+
+  @media (max-width:860px){
+    .nav-links{ display:none; }
+    .plan-layout{ grid-template-columns:1fr; }
+    .footer-grid{ grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="mark">⌕</span>LookIt</div>
+    <div class="nav-links">
+      <a href="premium.html#benefits">Benefits</a>
+      <a href="premium.html#plans">Plans</a>
+      <a href="premium.html#pay">Payment</a>
+      <a href="premium.html#money">Where it goes</a>
+    </div>
+    <a href="https://lookit.xo.je/search" class="nav-cta">Back to LookIt</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="beam"></div>
+  <div class="wrap">
+    <div class="badge"><span class="dot"></span> Premium · Lifetime</div>
+    <h1>Pay once, keep it <span class="accent">forever</span>.</h1>
+    <p class="lead">One payment, no renewals. Lifetime gets you every Pro benefit for as long as LookIt is around, plus your name in the credits.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="plan-layout">
+      <div>
+        <div class="price-card">
+          <div class="plan-name">Lifetime</div>
+          <div class="plan-price">$30<span>once</span></div>
+          <p class="plan-desc">Pay once, keep every Pro benefit for as long as LookIt exists.</p>
+
+          <div class="discord-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.001-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.673-3.549-13.66a.06.06 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.211 0 2.176 1.094 2.157 2.418 0 1.334-.955 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.211 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg>
+            <p>Payments are handled by staff over on our <strong>Discord</strong>. Join the server, open a ticket in #premium, and someone will get you set up. Crypto (BTC, ETH, USDC) is also accepted for Lifetime.</p>
+          </div>
+
+          <a href="https://discord.gg/wZcus4r4" class="join-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.001-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.673-3.549-13.66a.06.06 0 0 0-.031-.028zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.211 0 2.176 1.094 2.157 2.418 0 1.334-.955 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.211 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg>
+            Join to pay
+          </a>
+        </div>
+
+        <div class="other-plans">
+          <p>Looking for something different?</p>
+          <div class="links">
+            <a href="supporter.html">See Supporter →</a>
+            <a href="pro.html">See Pro →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-card">
+        <h3>What's included</h3>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Pro — themes, sync, widgets, early access, priority support</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>No renewals, ever — pay once and you're done</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lifetime badge and your name in the site credits</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Locked-in price, even if plans get more expensive later</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo"><span class="mark">⌕</span>LookIt</div>
+        <p style="margin-top:16px; font-size:0.88rem; color:var(--text-dim); line-height:1.6; max-width:260px;">
+          The free, ad-less, seamless, unlimited search tool.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h5>Info</h5>
+        <a href="https://lookit-up.github.io/lookit-up">About Me</a>
+        <a href="https://lookit-up.github.io/my-projects">My Projects</a>
+        <a href="https://lookit-up.github.io/socials">My Socials</a>
+      </div>
+      <div class="footer-col">
+        <h5>Site Map</h5>
+        <a href="https://lookit.xo.je/">About LookIt</a>
+        <a href="https://lookit.xo.je/search">LookIt Search</a>
+        <a href="https://lookit.xo.je/">Credits</a>
+      </div>
+      <div class="footer-col">
+        <h5>Tools</h5>
+        <a href="https://lookit.xo.je/tools">Tools Used</a>
+        <a href="https://lookit.xo.je/promos">Promos</a>
+        <a href="https://lookit.xo.je/partners">Partners</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="mono">© 2026 LookIt — your favorite new tab</div>
+      <div class="mono"><a href="https://github.com/lookit-up/lookit">GitHub</a> / <a href="https://lookit-up.github.io/lookit">Backup</a> / <a href="https://lookit-up.github.io/lookit-up">About Me</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
