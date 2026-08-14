@@ -963,8 +963,8 @@
   var OPENROUTER_MODEL = "openrouter/free";
 
   // ---- fill these in with your Supabase project's values ----
-  var SUPABASE_URL       = "YOUR_SUPABASE_URL";       // e.g. "https://xxxxxxxx.supabase.co"
-  var SUPABASE_ANON_KEY  = "YOUR_SUPABASE_ANON_KEY";  // the public "anon" key, safe for client-side use
+  var SUPABASE_URL       = "https://gfymxmyekkzgfpmelwrv.supabase.co";       // e.g. "https://xxxxxxxx.supabase.co"
+  var SUPABASE_ANON_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdmeW14bXlla2t6Z2ZwbWVsd3J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDg2MjIsImV4cCI6MjEwMjIyNDYyMn0.P_wA6t0ZZ1_55EmDIESZihlP3FH0tX4UnUtEJQj3zG0";  // the public "anon" key, safe for client-side use
 
   var supabase = (window.supabase && SUPABASE_URL.indexOf('YOUR_') !== 0)
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
